@@ -1,0 +1,95 @@
+@import "./messages.css";
+@import "./layout/page-layout.css";
+@import "./layout/chat-layout.css";
+@import "./profile.css";
+@import "./inputs.css";
+@import "./login.css";
+@import "./box.css";
+@import "./user_element.css";
+@import "./elements.css";
+@import "./loading.css";
+
+:root {
+    --main: #404258; /* Sidebar and modals */
+    --text-light: #c4c5d4; /* Content text inputs */
+    --text-dark: #2b2b41;
+    --inputs: #50577A; /* Button not triggered */
+    --inputs-a: #474E68; /* Button active */
+    --borders: #7d80a1; /* Borders and dividers */
+    --background: #1a1a23;
+    --background-light: #717498;
+}
+
+.shadow-bg {
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    background: var(--background)
+}
+
+.center-align {
+    text-align: center;
+}
+
+.invisible {
+    visibility: collapse;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+
+tr:hover {
+    background-color: var(--inputs-a);
+}
+
+thead {
+    text-align: left;
+}
+
+a {
+    color: inherit;
+}
+
+h1 {
+    padding: 5%;
+}
+hr.black-border {
+    border: 1px solid var(--borders);
+}
+
+
+hr {
+    width: 80%;
+    margin: auto;
+}
+
+html {
+    font-family: 'Lato', sans-serif;
+}
+
+* {
+    margin: 0;
+    font-size: 16px;
+    text-decoration: none;
+    outline: none;
+    color: var(--text-light);
+    box-sizing: border-box;
+}
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: var(--text-light);
+    opacity: 1; /* Firefox */
+  }
+  
+  :-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: var(--text-light);
+  }
+  
+  ::-ms-input-placeholder { /* Microsoft Edge */
+    color: var(--text-light);
+  }

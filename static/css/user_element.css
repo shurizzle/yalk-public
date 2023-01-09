@@ -1,0 +1,122 @@
+.user-row {
+    padding: 5px 10px;
+    display: flex;
+}
+
+.user-row:hover {
+    background-color: var(--background-light);
+}
+
+.avatar-big {
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    border: 2px solid var(--borders);
+}
+.avatar {
+    border: 2px solid var(--borders);
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+}
+
+
+.status-badge {
+    /* position: relative; */
+    width: 15px;
+    height: 15px;
+}
+
+.fixed-status {
+    left: -12px;
+    top: 42px;
+}
+
+
+
+
+/* .message-row > .user-badge {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-items: center;
+    padding: 4px 8px;
+    gap: 10px;
+    border-radius: 5px;
+} */
+
+.btn-status {
+    position: absolute;
+    left: 45px;
+    bottom: 10px;
+    width: 15px;
+    height: 15px;
+}
+
+.status-popup { 
+    display: none; /* TODO: Cange to 'flex' */
+    position: fixed;
+    z-index: 9; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    /* background-color: rgb(0,0,0); /* Fallback color */
+    /* background-color: rgba(0,0,0,0.4); Black w/ opacity  */
+}
+
+.status-popup-content {
+    position: absolute;
+    bottom: 90px;
+    left: 15px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    min-width: fit-content;
+    max-width: 200px;
+    background-color: var(--background);
+    border: 1px solid var(--borders);
+}
+
+
+.search-popup { 
+    display: none; /* TODO: Cange to 'flex' */
+    position: fixed;
+    z-index: 9; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    /* background-color: rgb(0,0,0); /* Fallback color */
+    /* background-color: rgba(0,0,0,0.4); Black w/ opacity  */
+}
+
+.search-popup-content {
+    position: absolute;
+    top: 50px;
+    right: 175px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    width: 250px;
+    background-color: var(--background);
+    border: 1px solid var(--borders);
+}
+/* The Modal (background) */
+.bg-closer {
+    display: none; /* TODO: Cange to 'flex' */
+
+}
+
+.content  > button {
+    padding: 5px 10px;
+    text-align: left;
+}
+
+.content  > button:hover {
+    background-color: var(--inputs-a);
+}

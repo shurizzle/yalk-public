@@ -1,0 +1,18 @@
+.error-message {
+    display: none;
+    color: red;
+    background-color: rgba(252, 146, 146, 0.096);
+    font-weight: bold;
+    border-radius: 15px;
+    padding: 2em 1em;
+    min-height: fit-content;
+    margin: 10px;
+    top: 20%;
+    font-size: 0.5em;
+}
+
+#login-logo {
+    max-width: 300px;
+    padding: 15px 30px;
+    align-self: center;
+}

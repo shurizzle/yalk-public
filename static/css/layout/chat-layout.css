@@ -1,0 +1,87 @@
+.chat-grid {
+    display: grid;
+    overflow: hidden;
+    height: 100vh;
+    
+    grid-template-columns: auto 200px;
+    grid-template-rows: 50px auto 20px 75px;
+    grid-template-areas: "header search" 
+                         "receive users"
+                         "divider users"
+                         "send users";
+} 
+
+.receive {
+    display: flex;
+    flex-direction: column;
+    grid-area: receive;
+    overflow-y: auto;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.receive::-webkit-scrollbar {
+    display: none;
+}
+
+.chat-grid-header {
+    grid-area: header;
+    font-size: 1rem;
+    /* background-color: var(--main); */
+    background-color: var(--main);
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+
+}
+
+.chat-grid > .search-box input[type=text] {
+    padding: 6px;
+    margin-top: 8px;
+    font-size: 17px;
+    max-width: 80%;
+    border: none;
+  }
+
+.chat-grid > .search-box {
+    float: right;
+    /* padding: 6px 10px; */
+    cursor: pointer;
+    grid-area: search;
+    background-color: var(--main);
+}
+
+.chat-grid > .search-box button {
+    border: none;
+    padding: 6px 10px;
+    margin-top: 8px;
+    margin-right: 16px;
+}
+
+.chat-grid-users {
+    grid-area: users;
+    font-size: 1rem;
+    background-color: var(--main);
+}
+
+
+.chat-grid-divider {
+    grid-area: divider;
+    padding: 10px 0;
+    background-color: var(--background);
+
+}
+
+.chat-grid-send {
+    grid-area: send;
+    height: 150px;
+    background-color: var(--background);
+}
+
+.chat-grid-send > textarea {
+    width: 100%;
+    resize: none;
+    background-color: var(--background)
+}

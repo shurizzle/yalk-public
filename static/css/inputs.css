@@ -1,0 +1,68 @@
+
+.wide-button {
+    margin: 20px 0;
+    background: var(--inputs);
+    border-color: var(--inputs);
+    border-radius: 5px;
+}
+.wide-button:hover {
+    background: var(--inputs-a);
+    border-color: var(--inputs-a);
+    cursor: pointer;
+}
+
+.btn-fw {
+    width: 100%;
+    padding: 5px 10px;
+    text-align: left;
+}
+
+.btn-fw:hover {
+    background: var(--inputs-a);
+    border-color: var(--inputs-a);
+    cursor: pointer;
+}
+.btn-inv,
+.btn-action,
+.btn-edit,
+.btn-delete,
+.btn-open {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* .btn-inv:hover{
+    background-color: var(--inputs-a);
+    border: 1px solid var(--inputs-a);
+    border-radius: 5px;
+} */
+
+.max_width_250 {
+    max-width: 250px;
+}
+
+textarea {
+    border: 0;
+    padding: 0;
+    background-color: var(--inputs);
+}
+
+input, textarea{
+    outline:none;
+    background:var(--inputs);
+    color:var(--text-light);
+    border: 0;
+}
+input[type="color"] {
+    background-color: inherit;
+}
+
+input[type="file"] {
+    background-color: inherit;
+}
+
+/* input[type="text"] {
+    background-color: inherit;
+    max-width: fit-content;
+} */

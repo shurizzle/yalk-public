@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="static/css/main.css">
+
+        <script src="https://kit.fontawesome.com/406871c654.js" crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <script type="module" src="static/js/app.js"></script>
+        <script type="module" src="static/js/elements.js"></script>
+        <title>Yalk :)</title>
+    </head>
+    <body>
+        <div id="loading-screen" class="loading">Loading&#8230;</div>
+        <div class="main-grid">
+            <!-- SIDEBAR -->
+            <div id="sidebar" class="main-grid-sidebar">
+                <div id="sidebar-head">
+                    <a href="/chat"><img id="logo" class="sidebar-item" src="static/images/logo.svg"></a>
+                    <hr class="white-border">
+                </div>
+                <div class="sb-stats">
+                    <span class="side-stats">Server status </span><span id="statStatus" class="side-stats-counter">0</span>
+                    <span class="side-stats">Online users </span><span id="statOnline" class="side-stats-counter">0</span>
+                    <span class="side-stats">Total users </span><span id="statUsers" class="side-stats-counter">0</span>
+                    <span class="side-stats">Public channels </span><span id="statChannels" class="side-stats-counter">0</span>
+                </div>
+                <hr class="white-border">
+                <div class="side-chats">
+                    <div id="sidebar-channels" class="side-item-container">
+                        <div class="side-section-header">
+                            <span class="title">Channels</span>
+                            <button id="btnChans" class="btn-add btn-inv"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                    </div>
+                    <div id="sidebar-dms" class="side-item-container">
+                        <div class="side-section-header">
+                            <span class="title">Direct Messages</span>
+                            <button id="btnDms" class="btn-add btn-inv"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END SIDEBAR -->
+            <!-- MAIN CONTENT -->
+            <div class="main-grid-content">
+                <div class="chat-grid">
+                    <div id="chat-header" class="chat-grid-header">
+                        <div id="header-title">
+                            
+                        </div>
+                        <button id="header-delete" class="btn-inv"><i class="fa-solid fa-square-xmark"></i></button>
+                    </div>
+                    <div class="search-box">
+                        <input id="searchInput" type="text" placeholder="Search.." name="search"><i class="fa fa-search"></i>
+                    </div>
+                    <div id="receive" class="receive">
+                
+                    </div>
+                    <div id="server-users" class="chat-grid-users">
+                        
+                    </div>
+                    <div class="chat-grid-divider">
+                        <hr class="dark-border">
+                    </div>
+                    <div id="send-area" class="chat-grid-send">
+                        <textarea id="send" autocomplete="off" maxlength="1024" placeholder="Press enter to send a message" autofocus></textarea>
+                    </div>
+                </div>
+            </div>
+            <!-- END SIDEBAR -->
+            <div class="status-popup" id="user-status-popup">
+                <div class="status-popup-content">
+                    <button class="btn-fw btn-inv" onclick="updateStatus('online')">
+                        <img src="static/images/online.png" alt="avatar" class="status-badge">Online
+                    </button>
+                    <button class="btn-fw btn-inv" onclick="updateStatus('away')">
+                        <img src="static/images/away.png" alt="avatar" class="status-badge">Away
+                    </button>
+                    <button class="btn-fw btn-inv" onclick="updateStatus('busy')">
+                        <img src="static/images/busy.png" alt="avatar" class="status-badge">Busy
+                    </button>
+                </div>
+            </div>
+            <div class="search-popup" id="search-popup">
+                <div id="search-popup-content" class="search-popup-content">
+                    
+                </div>
+            </div>
+            <!-- <div id="modal" class="modal">
+
+            </div> -->
+        </div>
+    </body>
+</html>

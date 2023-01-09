@@ -1,0 +1,17 @@
+<svg width="323" height="185" viewBox="0 0 323 185" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="323" height="185" fill="none"/>
+<path d="M253 24C253 141.229 253 174.179 253 176" stroke="white" stroke-width="4" stroke-linecap="round"/>
+<path d="M303 176C264.438 117.386 253.599 100.911 253 100" stroke="white" stroke-width="4" stroke-linecap="round"/>
+<path d="M303 24C264.438 82.6144 253.599 99.0893 253 100" stroke="white" stroke-width="4" stroke-linecap="round"/>
+<path d="M192 24C192 141.229 192 174.179 192 176" stroke="white" stroke-width="4" stroke-linecap="round"/>
+<path d="M242 176C203.438 176 192.599 176 192 176" stroke="white" stroke-width="4" stroke-linecap="round"/>
+<path d="M152 24C123.464 141.229 115.443 174.179 115 176" stroke="white" stroke-width="4" stroke-linecap="round"/>
+<path d="M135 122C158.137 122 164.64 122 165 122" stroke="white" stroke-width="4" stroke-linecap="round"/>
+<path d="M152 24C175.137 141.229 181.64 174.179 182 176" stroke="white" stroke-width="4" stroke-linecap="round"/>
+<path d="M81.9999 83C126.274 83 137.114 43.6667 136.999 24" stroke="white" stroke-width="5" stroke-linecap="round"/>
+<path d="M82 82.9999C37.7257 82.9999 26.8863 43.6666 27.0009 23.9999" stroke="white" stroke-width="5" stroke-linecap="round"/>
+<ellipse cx="71" cy="24.5" rx="10" ry="15.5" fill="white"/>
+<path d="M88 45L102 61H88" stroke="white" stroke-width="3" stroke-linecap="round"/>
+<ellipse cx="109" cy="24.5" rx="10" ry="15.5" fill="white"/>
+<path d="M81.3292 176V83" stroke="white" stroke-width="4" stroke-linecap="round"/>
+</svg>

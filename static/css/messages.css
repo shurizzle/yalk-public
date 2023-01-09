@@ -1,0 +1,70 @@
+.message-row {
+    margin: 5px 0;
+    padding: 5px 10px;
+    display: grid;
+    grid-template-columns: 46px auto auto 1fr;
+    /* grid-template-rows: 30px; */
+    grid-template-areas: "avatar username timestamp timestamp"
+                        "avatar message message message"
+}
+
+.message-row:hover {
+    background-color: var(--background-light);
+}
+
+.message-row > .avatar {
+    grid-row: 1/3;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+.message-row > .timestamp-avatar {
+    grid-row: 1/3;
+    vertical-align: middle;
+    margin-right: 10px;
+    display: none;
+}
+
+.message-row:hover > .timestamp-avatar {
+    display: block;
+}
+
+.message-row > .username {
+    font-size: 0.75rem;
+    justify-self: unset;
+    /* grid-row: 1/3; */
+    margin-right: 10px;
+    font-weight: bold;
+    /* align-self: center; */
+}
+
+.message-row > .timestamp {
+    font-size: 0.5rem;
+    /* align-content: center; */
+    color: var(--background-light);
+    /* align-self: center; */
+}
+
+
+.message-row > .message {
+    grid-column: 2/5;
+    word-wrap: break-word;
+    max-width: 100%;
+}
+
+.server-message {
+    display: flex;
+    flex-direction: row;
+    margin: 5px 0;
+    padding: 5px 10px;
+}
+
+.server-message > .spacer {
+    flex-grow: 1;
+}
+
+.server-message > .text {
+    font-weight: 800;
+    margin: 0 10px;
+    min-width: fit-content;
+}

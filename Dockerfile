@@ -1,0 +1,23 @@
+FROM golang:latest
+
+WORKDIR /app
+COPY . .
+
+ENV HOST_ADDR="change"
+ENV HTTP_PORT=80
+ENV HTTPS_PORT=443
+ENV WEB_URL="change"
+
+ENV SOCKET_PORT=9988
+ENV SOCKET_TRANSPORT="tcp"
+
+ENV DB_ADDR="change"
+ENV DB_PORT=5432
+ENV DB_NAME="db_chat"
+ENV DB_USER="change"
+ENV DB_PASSWORD="change"
+ENV DB_SSLMODE="disable"
+
+# EXPOSE 80 443 9988
+
+ CMD ["go", "run", "."]
