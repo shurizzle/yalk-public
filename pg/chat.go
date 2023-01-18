@@ -12,16 +12,16 @@ import (
 	"github.com/lib/pq"
 )
 
-func MessageCreate(db *sql.DB, timestamp time.Time, message string, user_id string, chat_id string) (id string) {
+func MessageCreate(db *sql.DB, time time.Time, message string, from string, to string) (id string) {
 
-	sqlStatement := fmt.Sprintf(`INSERT INTO chats."%v" (timestamp, message, event, user_id)
+	sqlStatement := fmt.Sprintf(`INSERT INTO chats."%v" (time, message, event, user_id)
 								VALUES ($1, $2, $3, $4)
-								RETURNING id`, strings.ToUpper(chat_id))
-	err := db.QueryRow(sqlStatement, timestamp, message, "chat_message", user_id).Scan(&id)
+								RETURNING id`, strings.ToUpper(to))
+	err := db.QueryRow(sqlStatement, time, message, "chat_message", from).Scan(&id)
 	if err != nil {
 		panic(err)
 	}
-	logger.LogColor("DATABASE", fmt.Sprintf("Logged message %s in table '%s'", id, chat_id))
+	logger.LogColor("DATABASE", fmt.Sprintf("Logged message %s in table '%s'", id, to))
 	return
 }
 
@@ -29,10 +29,10 @@ func MessageReadAll(db *sql.DB, chat_id string) (messages map[string]shared.Chat
 	// sqlStatement := `SELECT * FROM all_messages_profiles_last_100;`
 	sqlStatement := fmt.Sprintf(`SELECT * FROM (
 		SELECT * FROM chats."%s"
-		ORDER BY timestamp DESC 
+		ORDER BY time DESC 
 		LIMIT 100
 		) sub
-	ORDER BY timestamp ASC;`, chat_id)
+	ORDER BY time ASC;`, chat_id)
 
 	rows, err := db.Query(sqlStatement)
 	if err != nil {
@@ -42,22 +42,22 @@ func MessageReadAll(db *sql.DB, chat_id string) (messages map[string]shared.Chat
 	messages = make(map[string]shared.Chat_Message)
 	for rows.Next() {
 		var id string
-		var timestamp time.Time
+		var time time.Time
 		var text string
 		var from string
 		var msg_type string
 
-		err = rows.Scan(&id, &timestamp, &text, &msg_type, &from)
+		err = rows.Scan(&id, &time, &text, &msg_type, &from)
 		if err != nil {
 			panic(err)
 		}
 		messageStruct := shared.Chat_Message{
-			ID:        id,
-			Timestamp: timestamp,
-			From:      from,
-			To:        chat_id,
-			Text:      text,
-			Type:      msg_type,
+			ID:   id,
+			Time: time,
+			From: from,
+			To:   chat_id,
+			Text: text,
+			Type: msg_type,
 		}
 		messages[id] = messageStruct
 	}

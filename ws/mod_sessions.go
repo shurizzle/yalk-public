@@ -9,6 +9,7 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"errors"
+	"log"
 	"net/http"
 	"time"
 
@@ -27,6 +28,8 @@ type SessionsManager struct {
 }
 
 func Validate(w http.ResponseWriter, r *http.Request) (session shared.HTTP_Session, err error) { // CHANGE TO ACCEPT ONLY THE COOKIE 'c.Cookie'
+	ua := r.UserAgent()
+	log.Printf("User Agent: %v", ua)
 	c, err := r.Cookie("session_token")
 	// Check browser cookies
 	if err != nil {

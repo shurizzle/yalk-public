@@ -8,6 +8,7 @@
 @import "./user_element.css";
 @import "./elements.css";
 @import "./loading.css";
+@import "./debug.css";
 
 :root {
     --main: #404258; /* Sidebar and modals */

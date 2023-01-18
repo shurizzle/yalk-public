@@ -1,3 +1,5 @@
+import * as Chat from "./chat.js"
+
 export function showModal(modalType) { // Change
     var modal = document.createElement('div')
     modal.className = 'modal'
@@ -24,9 +26,20 @@ export function showModal(modalType) { // Change
     form.method = "POST"
     form.id = "modal-form"
     form.className = 'flex-column'
+    form.addEventListener('submit', (ev) => {
+        ev.preventDefault();
+        const formData = new FormData(form)
+        let data = Chat.Open("channel_public", formData.get('channel_name'), [], ylk)
+        if (data === null) {
+            elementsHide(modal)
+            return
+        }
+        Chat.Change(data)
+    });
+
 
     let title = document.createElement("label")
-    let chatType;
+    let chatType, btnSubmit;
 
     switch (modalType) {
         case "channel":
@@ -40,7 +53,7 @@ export function showModal(modalType) { // Change
             name.name = 'channel_name'
             form.appendChild(lbl_name)
             form.appendChild(name)
-            btnSubmit = newSubmitButton("Create")
+            btnSubmit = NewSubmitButton("Create")
             form.appendChild(btnSubmit)
             break
 
@@ -59,12 +72,12 @@ export function showModal(modalType) { // Change
             lbl_name.innerText = "Username"
 
             var name = document.createElement("input")
-            var btnSubmit = newSubmitButton("Create")
+            btnSubmit = NewSubmitButton("Create")
 
             name.type = 'text'
             name.name = 'dms_name'
             name.addEventListener('keyup', function (e) {
-                searchUserAdd(e, sel_ctr)
+                UserButton(e, sel_ctr)
             })
 
             form.appendChild(title)
@@ -75,27 +88,13 @@ export function showModal(modalType) { // Change
             form.appendChild(btnSubmit)
             break
 
-        // case "user":
-        //     var form = newFormTemplate("/dm/create", "POST", "New Direct Message", newDm)
-        //     var lbl_name = document.createElement("label")
-        //     lbl_name.innerText = "Username"
-        //     form.appendChild(lbl_name)
-        //     var name = document.createElement("input")
-        //     name.type = 'text'
-        //     name.name = 'dms_name'
-        //     form.appendChild(name)
-        //     btnSubmit = newSubmitButton("Create")
-        //     form.appendChild(btnSubmit)
-        //     return form
+
     }
     modal_content.append(form)
     modal.append(modal_content)
 
     return modal
-    // modal.addEventListener("click", function (e) {
-    //     modal.style.display = "none";
-    //     modal_content.innerHTML = ''
-    // })
+
 }
 
 function createModalUpdateUser(id, display_name) {
@@ -206,72 +205,45 @@ export function showStatusPopup() {
     document.getElementById("user-status-popup").style.display = "block";
 };
 
-export function elementsHide() {
-    var modal = document.getElementById("modal-box");
-    var search_popup = document.getElementById("search-popup");
-    if (modal != null) {
-        modal.style.display = 'none'
-    }
-    if (search_popup != null) {
-        search_popup.style.display = 'none'
-    }
-}
-
-window.onclick = function (event) {
+export function elementsHide(target) {
+    // var modal = document.getElementById("modal-box");
+    // var search_popup = document.getElementById("search-popup");
+    // if (modal != null) {
+    //     modal.style.display = 'none'
+    // }
+    // if (search_popup != null) {
+    //     search_popup.style.display = 'none'
+    // }
     let popup = document.getElementById("user-status-popup")
     let search_popup = document.getElementById("search-popup")
-
     let modal = document.getElementById("modal-box")
-
-    let remove = false;
-    switch (event.target) {
-        case popup:
-            popup.style.display = "none";
-            remove = true
-            break
-
-        case search_popup:
-            var input = document.getElementById("searchInput")
-            input.value = ""
-            search_popup.style.display = "none";
-            remove = true
-            break
-
-        case modal:
-            modal.style.display = "none";
-            remove = true
-            break
+    if (popup && target == popup) {
+        popup.style.display = "none";
+        popup.remove()
     }
-    if (remove === true){event.target.remove()}
-    // if (event.target == popup || event.target == search_popup) {
-    //     popup.style.display = "none";
-    // }
+    if (search_popup && target == search_popup) {
+        document.querySelector('#searchInput').value = ''
+        search_popup.style.display = "none";
+        // search_popup.remove()
+    }
+    if (modal && target == modal) {
+        modal.style.display = "none";
+        modal.remove()
+    }
+
 }
 
-// function newForm(action, method, form_title, cb, chatType, data) {
-//     let form = document.createElement("form")
-//     form.id = "modal-form"
-//     form.action = action
-//     form.method = method
-//     form.className = 'flex-column'
+window.onclick = (ev) => {
+    elementsHide(ev.target)
 
-//     form.addEventListener('submit', function (e) {
-//         e.preventDefault(); // avoid to execute the actual submit of the form.
-//         cb(chatType, e.target.value, [], ylk)
-//         let modal = document.getElementById("modal-box")
-//         if (modal != null) { modal.remove() } //TODO: Move in app.js on the return
+}
 
-//     });
-//     var title = document.createElement("label")
-//     title.innerText = form_title
-//     form.appendChild(title)
-//     return form
-// }
+
 
 // * Modal content elements
 
-function newSubmitButton(text) {
-    var btnSubmit = document.createElement('button')
+function NewSubmitButton(text) {
+    let btnSubmit = document.createElement('button')
     btnSubmit.className = 'modal-close'
     btnSubmit.innerText = text
     return btnSubmit
@@ -279,7 +251,7 @@ function newSubmitButton(text) {
 
 // * Chat Buttons
 
-export function newHashtagText(name) {
+export function NewHashtagText(name) {
     var icon_hashtag = document.createElement('i')
     icon_hashtag.classList = 'fa-solid fa-hashtag'
     var channel_text = document.createElement('span')
@@ -288,7 +260,7 @@ export function newHashtagText(name) {
 
 }
 
-export function newBubbleText(name) {
+export function NewBubbleText(name) {
     var icon_bubble = document.createElement('i')
     icon_bubble.classList = 'fa-solid fa-message'
     var bubble_text = document.createElement('span')
@@ -334,7 +306,7 @@ export function WhiteSpacer() {
     return spacer
 }
 
-export function elementsMessageRow(last_msg, user_id, type_message, display_name, message, is_admin, color, _timestamp, message_id) {
+export function MessageRow(last_msg, user_id, type_message, display_name, message, is_admin, color, _time, message_id) {
     var message_row = document.createElement('div')
     message_row.id = message_id
 
@@ -363,24 +335,25 @@ export function elementsMessageRow(last_msg, user_id, type_message, display_name
         msg.className = "message"
         msg.innerText += message
 
-        if (_timestamp != "") {
-            var unix_time = Date.parse(_timestamp)
-            var timestamp = new Date(_timestamp)
+        let time, unix_time
+        if (_time != "") {
+            unix_time = Date.parse(_time)
+            time = new Date(_time)
         } else {
-            var unix_time = Date.now();
-            var timestamp = new Date()
+            unix_time = Date.now();
+            time = new Date()
         }
 
-        var locale_date = timestamp.toLocaleDateString()
-        var locale_time = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        var locale_date = time.toLocaleDateString()
+        var locale_time = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
-        var message_timestamp = document.createElement('span')
-        message_timestamp.innerText = locale_date + ' - ' + locale_time
-        message_timestamp.className = "timestamp"
+        var message_time = document.createElement('span')
+        message_time.innerText = locale_date + ' - ' + locale_time
+        message_time.className = "timestamp"
 
         if (last_msg != null) {
             var lm_from = last_msg.from
-            var lm_unix_time = Date.parse(last_msg.timestamp)
+            var lm_unix_time = Date.parse(last_msg.time)
 
             if (lm_from == user_id && unix_time < (lm_unix_time + 600000) && type_message != "server_message") {
                 var l_container = document.createElement('span')
@@ -389,7 +362,7 @@ export function elementsMessageRow(last_msg, user_id, type_message, display_name
                 l_container.display = 'hidden'
                 // l_container.className = "avatar"
                 userDisplayName.style.display = 'none'
-                message_timestamp.style.display = 'none'
+                message_time.style.display = 'none'
             } else {
                 var l_container = document.createElement('img')
                 l_container.className = "avatar"
@@ -401,7 +374,7 @@ export function elementsMessageRow(last_msg, user_id, type_message, display_name
                 var l_container = document.createElement('span')
                 l_container.innerText = locale_time
                 userDisplayName.style.display = 'none'
-                message_timestamp.style.display = 'none'
+                message_time.style.display = 'none'
             } else {
                 var l_container = document.createElement('img')
                 l_container.className = "avatar"
@@ -412,34 +385,12 @@ export function elementsMessageRow(last_msg, user_id, type_message, display_name
     }
     message_row.appendChild(l_container)
     message_row.appendChild(userDisplayName)
-    message_row.appendChild(message_timestamp)
+    message_row.appendChild(message_time)
     message_row.appendChild(msg)
     message_row.className = "message-row"
     return message_row
 }
 
-// export function NewDmButton(id, users, Users, CurrentUser) {
-//     let dm_button = document.createElement('button')
-//     dm_button.id = id
-//     dm_button.className = 'side-item sidebar-item'
-//     const self_index = users.indexOf(CurrentUser)
-//     if (self_index > -1) {
-//         users.splice(self_index, 1)
-//     }
-//     var users_display_names = []
-//     users.forEach(element => {
-//         users_display_names.push(ylk.Users[element].display_name)
-//     })
-//     let bubble_items = newBubbleText(users_display_names.toString())
-
-//     dm_button.appendChild(bubble_items.icon_bubble)
-//     dm_button.appendChild(bubble_items.bubble_text)
-
-//     dm_button.addEventListener('click', function (e) {
-//         changeDm(id)
-//     })
-//     return dm_button
-// }
 
 export function noResultRow() {
     var user_row = document.createElement('div')
@@ -450,4 +401,53 @@ export function noResultRow() {
     user_row.appendChild(text)
 
     return user_row
+}
+
+export function UserButton(userData, containerNode) {
+    let _btn = new DocumentFragment()
+    var btn = document.createElement('button')
+    btn.addEventListener('click', (ev) => {
+        let data = Chat.Open("dm", "#", userData.user_id, ylk)
+        if (data === null) {
+            elementsHide(containerNode)
+            return
+        }
+        Chat.Change(data)
+    })
+    var user_avatar = document.createElement('img')
+    user_avatar.className = 'avatar'
+    user_avatar.src = 'static/data/user_avatars/' + userData.user_id + '/avatar.png'
+
+    user_avatar.style.borderColor = userData.color
+
+    var status_dot = document.createElement('img')
+    status_dot.className = 'status-badge'
+    status_dot.src = 'static/images/' + userData.status + '.png'
+
+    var username = document.createElement('span')
+    username.className = 'username'
+    username.innerText = userData.display_name
+
+    if (containerNode != undefined && containerNode != null) { //&& (sel_ctr != undefined && sel_ctr != null)) {
+        btn.id = 'user-profile-' + userData.user_id
+        btn.classList = 'profile-row btn-fw btn-inv'
+
+    } else {
+        btn.id = userData.user_id
+        btn.classList = 'profile-row btn-fw btn-inv'
+        btn.addEventListener("click", function (input) {
+            input.value = ""
+            document.querySelector("#search-popup").style.display = 'none'
+            let user = document.createElement('span')
+            user.innerText = userData.user_id
+        })
+    }
+    btn.appendChild(user_avatar)
+    btn.appendChild(status_dot)
+    btn.appendChild(username)
+    var dmIcon = NewDMIcon(userData.user_id)
+    btn.appendChild(dmIcon)
+    _btn.appendChild(btn)
+
+    return _btn
 }

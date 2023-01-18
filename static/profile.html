@@ -1,80 +1,47 @@
-{{define "main"}}
-{{$logged_user := index .Data "logged_user"}}
-{{$server_users := index .Data "server_users"}}
-{{$b_col := $logged_user.Color}}
-<!--    Object with m_* are part of Modal boxes
-        Objects with p_* are part of Profile box
--->
-<!-- <script src="static/js/app.js"></script> -->
-<script src="static/js/settings.js"></script>
-<script src="static/js/f/modal_update_user.js"></script>
-<script src="static/js/admin/sudo_v1.js"></script>
-<div class="flex-container"> 
-        <div class="box box-shadow box-flex-grow-2">
-                <span class="box-title">Users<br /></span>
-                <span class="box-title">Profile picture<br /></span>
-                <form id="user-profile" action="/user/update" method="POST">
-                        <!-- User settings<span visible="hidden">✅ Updated</span> -->
-                        <label for="display_name">Display name</label><br />
-                        <input type="color" id="color_pick" autocomplete="off" name="color_pick" value="{{$logged_user.Color}}">
-                        <input type="text" id="display_name" autocomplete="off" name="display_name" value="{{$logged_user.DisplayName}}"><br /><br />
-                        <label for="color_pick">Badge color</label><br />
-                        <input class="wide-button" type="submit" value="Update">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="static/css/main.css">
 
-                </form>
-                <form enctype="multipart/form-data" id="user-profile" action="/user/update/avatar" method="POST">
-                        <img src="static/data/user_avatars/{{$logged_user.ID}}/avatar.png" alt="avatar" class="avatar-profile"><br /><br />
-                        <input type="file" id="picture" name="picture"><br /><br />
-                        <input class="wide-button" type="submit" value="Update">
-                </form>
-                </div>
-        </div>
-        {{if $logged_user.IsAdmin }}
-        <div class="flex-container"> 
+        <script src="https://kit.fontawesome.com/406871c654.js" crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+        <script type="module" src="static/js/app.js"></script>
+        <script type="module" src="static/js/elements.js"></script>
+        <script src="static/js/settings.js"></script>
+        <script src="static/js/ngula/sudo_v1.js"></script>
+        <title>Settings</title>
+</head>
+<body>
+        <div class="flex-container">
                 <div class="box box-shadow box-flex-grow-2">
-                        <span class="box-title">Users</span>
-                        <button class="btn-action" onclick="addRow()"><i class="fa-solid fa-user-plus"></i></button>
-                        <table id="users-table" class="data-table">
-                                <thead>
-                                        <tr>
-                                                <th>ID</th>
-                                                <th>Username</th>
-                                                <th>Password</th>
-                                                <th>Admin</th>
-                                                <th>Actions</th>
-                                        </tr>
-                                </thead>
-                                <tbody>
-                                        <!-- Sizing invisible row -->
-                                        <tr class="invisible">
-                                                <td>999</td>
-                                                <td><input class="max_width_250" type="text"></td>
-                                                <td><input class="max_width_250" type="text"></td>
-                                                <td>aaaaa</td>
-                                                <td></td>
-                                        </tr>
-                                        <!-- / / / / / -->
-                                {{range $i, $data := $server_users}}
-                                        <tr id="user_row_{{$data.ID}}">
-                                                <td>{{$data.ID}}</td>
-                                                <td>{{$data.Username}}</td>     
-                                                <td>**********</td>
-                                                <td>{{$data.IsAdmin}}</td>
-                                                <td class="center-align">
-                                                        <button id="btn-edit" class="btn-action" onclick="updateUser('{{$logged_user.ID}}')"><i class="fa-solid fa-pen-to-square"></i></button>
-                                                        <button id="btn-delete" class="btn-action" onclick="UserDelete('{{$logged_user.ID}}')"><i class="fa-solid fa-trash"></i></button>
-                                                </td>
-                                        </tr>
-                                {{end}}
-                                </tbody>
-                        </table>
-                        <div id="user-modal" class="modal">
-                                <div class="modal-content">            
-                                </div>
-                        </div>
-                        <script src="static/js/modal.js"></script>
+                        <span class="box-title">Users<br /></span>
+                        <span class="box-title">Profile picture<br /></span>
+                        <form id="user-profile" action="/user/update" method="POST">
+                                <!-- User settings<span visible="hidden">✅ Updated</span> -->
+                                <label for="display_name">Display name</label><br />
+                                <input type="color" id="color_pick" autocomplete="off" name="color_pick">
+                                <input type="text" id="display_name" autocomplete="off" name="display_name"><br /><br />
+                                <label for="color_pick">Badge color</label><br />
+                                <input class="wide-button" type="submit" value="Update">
+
+                        </form>
+                        <form enctype="multipart/form-data" id="user-profile" action="/user/update/avatar"
+                                method="POST">
+                                <img src="static/data/user_avatars/default/avatar.png" alt="avatar"
+                                        class="avatar-profile"><br /><br />
+                                <input type="file" id="picture" name="picture"><br /><br />
+                                <input class="wide-button" type="submit" value="Update">
+                        </form>
                 </div>
+                <div id="user-modal" class="modal">
+                        <div class="modal-content">
+                        </div>
+                </div>
+                <script src="static/js/modal.js"></script>
         </div>
-        {{end}}
-</div>
-{{end}}
+</body>
+
+</html>

@@ -96,7 +96,7 @@ func ProfileUpdate(db *sql.DB, user_id string, display_name string, color string
 	logger.LogColor("DATABASE", fmt.Sprintf("Updated id %v", user_id))
 }
 
-func UserReadAll(db *sql.DB) (all_users []shared.User_Profile) {
+func UserReadAll(db *sql.DB) (all_users map[string]shared.User_Profile) {
 	// sqlStatement := `SELECT sub.*, users_settings.display_name, users_settings.color FROM
 	// 				(
 	// 					SELECT * FROM chat_channel_1 ORDER BY timestamp DESC LIMIT 100
@@ -111,7 +111,7 @@ func UserReadAll(db *sql.DB) (all_users []shared.User_Profile) {
 		panic(err)
 	}
 	defer rows.Close()
-
+	all_users = make(map[string]shared.User_Profile)
 	for rows.Next() {
 		var user_id string
 		var username string
@@ -141,7 +141,7 @@ func UserReadAll(db *sql.DB) (all_users []shared.User_Profile) {
 			LastOffline: last_offline,
 		}
 
-		all_users = append(all_users, user_profile)
+		all_users[user_id] = user_profile
 	}
 	err = rows.Err()
 	if err != nil {
@@ -170,16 +170,17 @@ func UserStatusRead(db *sql.DB, user_id string) (status string, err error) {
 	}
 }
 
-func UserStatusUpdate(db *sql.DB, user_id string, status string, status_fixed bool) {
+func UserStatusUpdate(db *sql.DB, user_id string, status string, status_fixed bool) error {
 	sqlStatement := `UPDATE user_status 
 					SET status = $2, status_fixed  = $3
 					WHERE id = $1`
 	_, err := db.Exec(sqlStatement, user_id, status, status_fixed)
 	if err != nil {
 		logger.LogColor("DATABASE", "Error UPDATING status")
-		return
+		return err
 	}
 	logger.LogColor("DATABASE", fmt.Sprintf("Updated status for id %v", user_id))
+	return nil
 }
 
 func UserDelete(db *sql.DB, user_id string) {

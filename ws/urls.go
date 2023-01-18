@@ -37,19 +37,19 @@ func p_Login(w http.ResponseWriter, r *http.Request) {
 	//TODO: Change the error query with MessageEvent: https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent
 
 	error_code := r.URL.Query().Get("error") // Error_Code stores the error code from URL Query, err in this case is a clean case so just display the context
-	var payload shared.Data_Payload
+	var payload shared.Payload
 
-	if error_code == "true" {
-		payload = shared.Data_Payload{
-			Success: true,
-			Event:   "error_login",
-		}
-	} else {
-		payload = shared.Data_Payload{
-			Success: true,
-			Event:   "",
-		}
-	}
+	// if error_code == "true" {
+	// 	payload = shared.Payload{
+	// 		Success: true,
+	// 		Event:   "error_login",
+	// 	}
+	// } else {
+	// 	payload = shared.Payload{
+	// 		Success: true,
+	// 		Event:   "",
+	// 	}
+	// }
 	_, err := Validate(w, r)
 	if err == nil {
 		http.Redirect(w, r, "/chat", http.StatusFound)
@@ -105,7 +105,6 @@ func p_Login(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/chat", http.StatusFound) // Chat if login successful
 		}
 	}
-	// w.Header().Add("Cache-Control", "no-store, must-revalidate")
 
 	base_page := filepath.Join("static", "login.html")
 	temp := template.Must(template.New("login.html").ParseFiles(base_page))
@@ -134,7 +133,7 @@ func p_Chat(w http.ResponseWriter, r *http.Request) {
 		channel_id = "main"
 	}
 
-	http_response(w, true, nil)
+	http_response(w, true, "base.html", nil)
 }
 
 func p_Profile(w http.ResponseWriter, r *http.Request) {
@@ -153,13 +152,13 @@ func p_Profile(w http.ResponseWriter, r *http.Request) {
 	all_users := pg.UserReadAll(active_ws.DBconn)
 
 	profile_page_data := map[string]any{"logged_user": user_profile, "server_users": all_users}
-	payload := shared.Data_Payload{
+	payload := shared.Payload{
 		Success: true,
 		Origin:  http_session.UserID,
 		Event:   event,
 		Data:    profile_page_data,
 	}
-	http_response(w, true, payload)
+	http_response(w, true, "profile.html", payload)
 }
 
 func p_Logout(w http.ResponseWriter, r *http.Request) {
@@ -185,20 +184,20 @@ func p_Logout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/login", http.StatusFound)
 }
 
-func p_Pinger(w http.ResponseWriter, r *http.Request) { //! Server Core!
-	// ! MUST INTRODUCE CHECK IF THE USER IS THE SAME AS THE ONE TIED TO SESSION TOKEN
-	logger.LogColor("HTTPS", fmt.Sprintf("Ping received from %s", r.RemoteAddr)) // TODO Write Logger() function in core.go
-	// context := "logout" // * Unused for now
-	defer r.Body.Close()
+// func p_Pinger(w http.ResponseWriter, r *http.Request) { //! Server Core!
+// 	// ! MUST INTRODUCE CHECK IF THE USER IS THE SAME AS THE ONE TIED TO SESSION TOKEN
+// 	logger.LogColor("HTTPS", fmt.Sprintf("Ping received from %s", r.RemoteAddr)) // TODO Write Logger() function in core.go
+// 	// context := "logout" // * Unused for now
+// 	defer r.Body.Close()
 
-	if r.Method != http.MethodPost {
-		return
-	}
-	_, err := Validate(w, r)
-	if err != nil {
-		// http.Redirect(w, r, "/login", http.StatusFound)
-		return
-	}
-	// w.WriteHeader(http.StatusOK)
-	http_response(w, false, nil)
-}
+// 	if r.Method != http.MethodPost {
+// 		return
+// 	}
+// 	_, err := Validate(w, r)
+// 	if err != nil {
+// 		// http.Redirect(w, r, "/login", http.StatusFound)
+// 		return
+// 	}
+// 	// w.WriteHeader(http.StatusOK)
+// 	http_response(w, false, nil)
+// }

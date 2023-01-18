@@ -13,10 +13,11 @@ import (
 var active_ws *WebServer
 
 type WebServer struct {
+	// API      *ApiServer
+	// SSE      *SSEServer
 	URL      string
-	API      *ApiServer
 	SM       *SessionsManager
-	SSE      *SSEServer
+	WSOCK    *WebSocketServer
 	Clients  map[string]chan []byte
 	channels shared.Server_Channels
 	ip       string
@@ -25,7 +26,7 @@ type WebServer struct {
 	DBconn   *sql.DB
 }
 
-func New_WebServer(channels shared.Server_Channels, dbconn *sql.DB, api_dbconn *sql.DB, sse_dbconn *sql.DB, sm_dbconn *sql.DB, ip string, port string, portTls string, url string) (ws *WebServer) {
+func New_WebServer(channels shared.Server_Channels, wsock_dbconn *sql.DB, dbconn *sql.DB, api_dbconn *sql.DB, sse_dbconn *sql.DB, sm_dbconn *sql.DB, ip string, port string, portTls string, url string) (ws *WebServer) {
 	ws = &WebServer{
 		DBconn:  dbconn,
 		Clients: make(map[string]chan []byte),
@@ -48,7 +49,7 @@ func New_WebServer(channels shared.Server_Channels, dbconn *sql.DB, api_dbconn *
 	http.HandleFunc("/login", p_Login)
 	http.HandleFunc("/logout", p_Logout)
 	http.HandleFunc("/chat", p_Chat)
-	// http.HandleFunc("/user", p_Profile)
+	http.HandleFunc("/profile", p_Profile)
 
 	http_addr := ip + ":" + string(port)
 	https_addr := ip + ":" + string(portTls)
@@ -58,12 +59,14 @@ func New_WebServer(channels shared.Server_Channels, dbconn *sql.DB, api_dbconn *
 	go http.ListenAndServeTLS(https_addr, "localhost.crt", "localhost.key", nil)
 	logger.LogColor("WEBSRV", "HTTPS listener started")
 
+	ws.WSOCK = NewWebSocketServer(wsock_dbconn, channels) //, ip, socketPort, socketTransport)
+
 	// * Starting API Server
 	// api_dbconn := pg.NewPostgreConn(IP, Port, Name, Username, Password, SSLMode)
-	ws.API = New_Api(api_dbconn, channels)
+	// ws.API = New_Api(api_dbconn, channels)
 
 	// sse_dbconn := pg.NewPostgreConn(IP, Port, Name, Username, Password, SSLMode)
-	ws.SSE = new_SSEServer(sse_dbconn)
+	// ws.SSE = new_SSEServer(sse_dbconn)
 
 	// * Starting Session Manager
 	// sm_dbconn := pg.NewPostgreConn(IP, Port, Name, Username, Password, SSLMode)
@@ -81,10 +84,10 @@ func tls_redir(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, ":443", http.StatusSeeOther)
 }
 
-func http_response(w http.ResponseWriter, renderTemplate bool, _payload any) {
+func http_response(w http.ResponseWriter, renderTemplate bool, _fileName string, _payload any) {
 	if !renderTemplate {
 		switch _payload.(type) {
-		case shared.Data_Payload:
+		case shared.Payload:
 			payload, err := json.Marshal(_payload)
 			if err != nil {
 				logger.LogColor("HTTPS", "Marshaling error")
@@ -99,11 +102,11 @@ func http_response(w http.ResponseWriter, renderTemplate bool, _payload any) {
 			return
 		}
 	} else {
-		webapp := filepath.Join("static", "base.html")
-		temp := template.Must(template.New("base.html").ParseFiles(webapp))
+		webapp := filepath.Join("static", _fileName)
+		temp := template.Must(template.New(_fileName).ParseFiles(webapp))
 
 		switch _payload.(type) {
-		case shared.Data_Payload:
+		case shared.Payload:
 			payload, err := json.Marshal(_payload)
 			if err != nil {
 				logger.LogColor("HTTPS", "Marshaling error")

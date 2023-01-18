@@ -35,7 +35,7 @@ type Socket_Server struct {
 	ConnectedClients int
 	channels         shared.Server_Channels
 	listener         net.Listener
-	message_channel  chan shared.Data_Payload
+	message_channel  chan shared.Payload
 	activeUsers      map[string][]byte
 
 	// MaxClients       int
@@ -47,7 +47,7 @@ type client struct {
 	Username string
 	// closeConn  bool
 	isSetup         bool
-	message_channel chan shared.Data_Payload
+	message_channel chan shared.Payload
 }
 
 func NewSocketServer(channels shared.Server_Channels, dbconn *sql.DB, ip string, port string, transport string) (tcp *Socket_Server) {
@@ -62,7 +62,7 @@ func NewSocketServer(channels shared.Server_Channels, dbconn *sql.DB, ip string,
 		transport:       transport,
 		Clients:         make(map[int]*client),
 		listener:        new_listener,
-		message_channel: make(chan shared.Data_Payload),
+		message_channel: make(chan shared.Payload),
 	}
 
 	logger.LogColor("SOCKET", fmt.Sprintf("Started listener: %s:%s", ip, port))
@@ -170,7 +170,7 @@ func (c *client) messageListen() {
 					c.Socket.Write([]byte(msg))
 					msg = session_token
 					c.Socket.Write([]byte(msg))
-					payload := shared.Data_Payload{
+					payload := shared.Payload{
 						Success: true,
 						Event:   "tcp_client_connect",
 						Data:    user_profile,
@@ -190,8 +190,8 @@ func (c *client) messageListen() {
 			panic(err)
 		}
 		logger.LogColor("SOCKET", fmt.Sprintf("received from %s: %s", user_profile.Username, string(buff)))
-		// frame := shared.Data_Payload{
-		// 	Payload: shared.Data_Payload{
+		// frame := shared.Payload{
+		// 	Payload: shared.Payload{
 		// 		User: user_profile,
 		// 		Message: shared.Chat_Message{
 		// 			Text: string(buff),

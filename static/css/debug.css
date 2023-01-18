@@ -1,0 +1,26 @@
+#debug-window {
+    position: absolute;
+    z-index: 1000;
+    background-color: whitesmoke;
+    border: 1px solid mediumpurple;
+    text-align: center;
+
+}
+
+#debug-header {
+    padding: 10px;
+    cursor: move;
+    z-index: 1001;
+    color: whitesmoke;
+    background-color: mediumpurple;
+}
+
+#debug-content {
+    padding: 10px;
+    color: black;
+
+}
+
+.debug-value {
+    color: brown;
+}

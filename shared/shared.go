@@ -30,12 +30,12 @@ type Credentials struct {
 }
 
 type Server_Channels struct {
-	Msg     chan Data_Payload
-	Dm      chan Data_Payload
-	Notify  chan Data_Payload
-	Cmd     chan Data_Payload
-	Conn    chan Data_Payload
-	Disconn chan Data_Payload
+	Msg     chan Payload
+	Dm      chan map[string]any
+	Notify  chan Payload
+	Cmd     chan Payload
+	Conn    chan Payload
+	Disconn chan Payload
 }
 
 type Conversation struct {
@@ -49,12 +49,12 @@ type Conversation struct {
 }
 
 type Chat_Message struct {
-	ID        string    `json:"message_id"`
-	Timestamp time.Time `json:"timestamp"`
-	From      string    `json:"from"`
-	To        string    `json:"to"`
-	Type      string    `json:"type"`
-	Text      string    `json:"text"`
+	ID   string    `json:"message_id"`
+	Time time.Time `json:"time"`
+	From string    `json:"from"`
+	To   string    `json:"to"`
+	Type string    `json:"type"`
+	Text string    `json:"text"`
 }
 
 type Server_Settings struct {
@@ -65,7 +65,7 @@ type Server_Settings struct {
 }
 
 type User_Profile struct {
-	ID          string    `json:"id"`
+	ID          string    `json:"user_id"`
 	Username    string    `json:"username"`
 	IsAdmin     string    `json:"is_admin"`
 	DisplayName string    `json:"display_name"`
@@ -77,21 +77,19 @@ type User_Profile struct {
 	LastOffline time.Time `json:"last_offline"`
 }
 
-type Data_Payload struct {
-	Success      bool     `json:"success"`
-	Origin       string   `json:"origin"`
-	Destinations []string `json:"destinations"`
-	Event        string   `json:"event"`
-	Data         any      `json:"data"`
+type Payload struct {
+	Success bool   `json:"success"`
+	Origin  string `json:"origin,omitempty"`
+	Event   string `json:"event"`
+	Data    any    `json:"data"`
 }
 
-func NewPayload(succ bool, orig string, dest []string, context string, context_type string, event string, data any) (payload Data_Payload) {
-	payload = Data_Payload{
-		Success:      succ,
-		Origin:       orig,
-		Destinations: dest,
-		Event:        event,
-		Data:         data,
+func NewPayload(succ bool, orig string, context string, context_type string, event string, data any) (payload Payload) {
+	payload = Payload{
+		Success: succ,
+		Origin:  orig,
+		Event:   event,
+		Data:    data,
 	}
 	return payload
 }
