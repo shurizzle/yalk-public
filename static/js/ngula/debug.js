@@ -10,6 +10,7 @@ export function DragElement(elmnt) {
       elmnt.onmousedown = dragMouseDown;
     }
   
+    // This is literally a copy/paste of fucking W3School and must be re-done
     function dragMouseDown(e) {
       e = e || window.event;
       e.preventDefault();

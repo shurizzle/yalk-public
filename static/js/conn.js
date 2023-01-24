@@ -31,11 +31,11 @@ function dial() {
 
     conn.onopen = (ev) => {
         console.log("Connected:", ev)
-        let greeting_message = JSON.stringify({
-            "event": "greeting_message",
+        let initialPayload = JSON.stringify({
+            "event": "user_conn",
             "message": "test_message",
         })
-        conn.send(greeting_message)
+        conn.send(initialPayload)
     }
 }
 

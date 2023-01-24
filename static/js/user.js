@@ -1,15 +1,17 @@
-import { NewDMIcon } from "./elements.js"
+import { NewDMIcon, StatusPopup } from "./elements.js"
 
 // **** User ****
 class User {
-    constructor(id, username, display_name, color, status, is_admin, joined_chats) {
+    constructor(id, username, display_name, color, status, statusText, isAdmin, joined_chats, isOnline) {
         this['user_id'] = id
         this['username'] = username
         this['display_name'] = display_name
         this['color'] = color
         this['status'] = status
-        this['is_admin'] = is_admin
+        this['statusText'] = statusText
+        this['isAdmin'] = isAdmin
         this['joined_chats'] = joined_chats
+        this['isOnline'] = isOnline
     }
     // get status() {return this.status}
     // set status(s) {this.status = s}
@@ -27,7 +29,7 @@ class User {
     //             instance.display_name = res["display_name"]
     //             instance.color = res["color"]
     //             instance.status = res["status"]
-    //             instance.is_admin = res["is_admin"]
+    //             instance.isAdmin = res["isAdmin"]
     //             instance.joined_chats = res["joined_chats"]
     //             var user_row_id = 'user-profile-' + instance.user_id
     //             var badge_selector = user_row_id + ' > img.status-badge'
@@ -38,41 +40,21 @@ class User {
     //         }
     //     })
     // }
-    
+
 }
 
 export function UserClass(res) {
-    let user_id = res["user_id"]
+    let userId = res["user_id"]
     let username = res["username"]
-    let display_name = res["display_name"]
+    let displayName = res["display_name"]
     let color = res["color"]
     let status = res["status"]
-    let is_admin = res["is_admin"]
-    let joined_chats = res["joined_chats"]
-    if (res["joined_chats"] != null) { joined_chats = res["joined_chats"] }
-    return new User(user_id, username, display_name, color, status, is_admin, joined_chats)
-}
-
-function userStatusUpdate(status) {
-    $.ajax({
-        url: "/user/update/status",
-        type: "post",
-        xhrFields: {
-            withCredentials: true
-        },
-        data: {
-            event: "status_update",
-            status: status,
-        },
-        success: function (response) {
-            ylk.Self.status
-            $('.btn-open img.status-badge').attr('src', 'static/images/' + status + '.png')
-            document.getElementById("user-status-popup").style.display = "none";
-        },
-        error: function (xhr) {
-            console.log(xhr)
-        }
-    });
+    let statusText = res["statusText"]
+    let isAdmin = res["isAdmin"]
+    let joinedChats = res["joined_chats"]
+    let isOnline = res["isOnline"]
+    if (res["joined_chats"] != null) { joinedChats = res["joined_chats"] }
+    return new User(userId, username, displayName, color, status, statusText, isAdmin, joinedChats, isOnline)
 }
 
 export function UserRow(current_user, userData) {
@@ -89,7 +71,11 @@ export function UserRow(current_user, userData) {
 
     var status_dot = document.createElement('img')
     status_dot.className = 'status-badge'
-    status_dot.src = 'static/images/' + userData.status + '.png'
+    if (userData.isOnline == false) {
+        status_dot.src = 'static/images/offline.png'
+    } else {
+        status_dot.src = 'static/images/' + userData.status + '.png'
+    }
 
     var username = document.createElement('span')
     username.className = 'username'
@@ -106,7 +92,9 @@ export function UserRow(current_user, userData) {
         status_btn.id = 'btnPopStatus'
         status_btn.classList = 'btn-open btn-status'
         status_btn.addEventListener('click', function (e) {
-            showStatusPopup();
+            let statusPopup = StatusPopup();
+            document.body.appendChild(statusPopup)
+            // document.getElementById("user-status-popup").style.display = "block";
         })
 
         var logout_link = document.createElement('a')
