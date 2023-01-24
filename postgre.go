@@ -4,7 +4,7 @@
 // !!!!!!
 // !!!!!!
 
-package pg
+package main
 
 import (
 	"database/sql"
@@ -13,7 +13,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type Postgre_Client struct {
+type postgreConfig struct {
 	IP       string
 	Port     string
 	Username string
@@ -22,8 +22,8 @@ type Postgre_Client struct {
 	SSLMode  string
 }
 
-func NewPostgreConn(dbConf Postgre_Client) (db *sql.DB) {
-	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", dbConf.IP, dbConf.Port, dbConf.Username, dbConf.Password, dbConf.DB, dbConf.SSLMode)
+func connector(config postgreConfig) (db *sql.DB) {
+	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", config.IP, config.Port, config.Username, config.Password, config.DB, config.SSLMode)
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		panic(err)

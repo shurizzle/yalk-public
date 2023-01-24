@@ -38,14 +38,14 @@ function addRow() {
             data: $(this).serialize(), // serializes the form's elements.
             success: function(response) {
                 username_new = $('#username-new').get(0)
-                is_admin_new = $('#admin').get(0)
+                isAdmin_new = $('#admin').get(0)
                 id_cell.innerText = response
                 username_cell.innerHTML = ''
                 username_cell.innerText = username_new.value
                 password_cell.innerHTML = ''
                 password_cell.innerText = '**********'
                 admin_cell.innerHTML = ''
-                admin_cell.innerText = is_admin_new.value
+                admin_cell.innerText = isAdmin_new.value
                 action_cell.innerHTML = '<button class="btn-action" onclick="UserDelete(' + response + ')"><i class="fa-solid fa-trash"></i></button>'
                 row_added = false
             },

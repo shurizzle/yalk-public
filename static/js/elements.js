@@ -158,13 +158,13 @@ function createModalUpdateUser(id, display_name) {
     m_form.appendChild(display_name_l)
     m_form.appendChild(m_display_name)
 
-    var is_admin_l = document.createElement("label")
-    is_admin_l.innerText = "Admin"
-    var m_is_admin = document.createElement("input")
-    m_is_admin.type = 'checkbox'
-    m_is_admin.name = 'is_admin'
-    m_form.appendChild(is_admin_l)
-    m_form.appendChild(m_is_admin)
+    var isAdmin_l = document.createElement("label")
+    isAdmin_l.innerText = "Admin"
+    var m_isAdmin = document.createElement("input")
+    m_isAdmin.type = 'checkbox'
+    m_isAdmin.name = 'isAdmin'
+    m_form.appendChild(isAdmin_l)
+    m_form.appendChild(m_isAdmin)
 
     var color_picker_l = document.createElement("label")
     color_picker_l.innerText = "Badge color"
@@ -193,7 +193,7 @@ function showUserEditModal(data) {
     m_user_id.value = json_data['id']
     m_username.value = json_data['username']
     m_display_name.value = json_data['display_name']
-    m_is_admin.value = json_data['is_admin']
+    m_isAdmin.value = json_data['isAdmin']
     m_color_pick.value = json_data['color']
 
     modal_content.appendChild(user_edit_frag)
@@ -201,8 +201,85 @@ function showUserEditModal(data) {
     modal.style.display = "flex";
 }
 
-export function showStatusPopup() {
-    document.getElementById("user-status-popup").style.display = "block";
+export function StatusPopup() {
+    let statusPopup = new DocumentFragment()
+
+    let popupContainer = document.createElement('div') 
+        popupContainer.id = "user-status-popup"
+        popupContainer.className = "status-popup"
+    
+    let popupContent = document.createElement('div')
+        popupContent.className = "status-popup-content"
+
+    let onlineButton = document.createElement('button')
+        onlineButton.id = "status-online"
+        onlineButton.classList = "btn-fw btn-inv"
+    let onlineBadge = document.createElement('img')
+        onlineBadge.src = "static/images/online.png"
+        onlineBadge.className = "status-badge"
+
+    let awayButton = document.createElement('button')
+        awayButton.id = "status-online"
+        awayButton.classList = "btn-fw btn-inv"
+    let awayBadge = document.createElement('img')
+        awayBadge.src = "static/images/away.png"
+        awayBadge.className = "status-badge"
+
+    let busyButton = document.createElement('button')
+        busyButton.id = "status-online"
+        busyButton.classList = "btn-fw btn-inv"
+    let busyBadge = document.createElement('img')
+        busyBadge.src = "static/images/busy.png"
+        busyBadge.className = "status-badge"
+
+    onlineButton.addEventListener('click', () => {
+        let data = {
+            "event": "user_update",
+            "status": "online"
+        }
+        ylk.Self.status = "online"
+        ylk.Sock.postMessage(data)
+        elementsHide(popupContainer)
+    })
+
+    awayButton.addEventListener('click', () => {
+        let data = {
+            "event": "user_update",
+            "status": "away"
+        }
+        ylk.Self.status = "away"
+        ylk.Sock.postMessage(data)
+        elementsHide(popupContainer)
+    })
+
+    busyButton.addEventListener('click', () => {
+        let data = {
+            "event": "user_update",
+            "status": "busy"
+        }
+        ylk.Self.status = "busy"
+        ylk.Sock.postMessage(data)
+        elementsHide(popupContainer)
+    })
+
+    onlineButton.appendChild(onlineBadge)
+    onlineButton.append("Online")
+
+    awayButton.appendChild(awayBadge)
+    awayButton.append("Away")
+
+    busyButton.appendChild(busyBadge)
+    busyButton.append("Busy")
+
+    popupContent.appendChild(onlineButton)
+    popupContent.appendChild(awayButton)
+    popupContent.appendChild(busyButton)
+
+    popupContainer.appendChild(popupContent)
+    statusPopup.appendChild(popupContainer)
+
+    return statusPopup
+
 };
 
 export function elementsHide(target) {
@@ -306,7 +383,9 @@ export function WhiteSpacer() {
     return spacer
 }
 
-export function MessageRow(last_msg, user_id, type_message, display_name, message, is_admin, color, _time, message_id) {
+export function MessageRow(last_msg, user_id, type_message, display_name, text, isAdmin, color, _time, message_id) {
+    let message = new DocumentFragment()
+
     var message_row = document.createElement('div')
     message_row.id = message_id
 
@@ -333,7 +412,7 @@ export function MessageRow(last_msg, user_id, type_message, display_name, messag
 
         var msg = document.createElement('span')
         msg.className = "message"
-        msg.innerText += message
+        msg.innerText += text
 
         let time, unix_time
         if (_time != "") {
@@ -351,7 +430,7 @@ export function MessageRow(last_msg, user_id, type_message, display_name, messag
         message_time.innerText = locale_date + ' - ' + locale_time
         message_time.className = "timestamp"
 
-        if (last_msg != null) {
+        if (last_msg != null || last_msg != undefined) {
             var lm_from = last_msg.from
             var lm_unix_time = Date.parse(last_msg.time)
 
@@ -388,7 +467,8 @@ export function MessageRow(last_msg, user_id, type_message, display_name, messag
     message_row.appendChild(message_time)
     message_row.appendChild(msg)
     message_row.className = "message-row"
-    return message_row
+    message.append(message_row)
+    return message
 }
 
 

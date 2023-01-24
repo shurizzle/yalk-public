@@ -152,9 +152,9 @@ export function Change(chat) {
         for (const [key, value] of Object.entries(chat.messages)) {
             let user_id = value.from
             let display_name = ylk.Users[user_id].display_name
-            let is_admin = ylk.Users[user_id].is_admin
+            let isAdmin = ylk.Users[user_id].isAdmin
             let color = ylk.Users[user_id].color
-            let message = MessageRow(lm, user_id, value.type, display_name, value.text, is_admin, color, value.time, key)
+            let message = MessageRow(lm, user_id, value.type, display_name, value.text, isAdmin, color, value.time, key)
             chat_messages.push(message)
             lm = value
         }
@@ -190,8 +190,8 @@ export function Open(chType, chName, chUsers, srvData, _chId) {
             "event": "chat_join",
             "id": _chId,
         }
-        ylk.Sock.postMessage(data)
         ylk.Queued.push(data)
+        ylk.Sock.postMessage(data)
         return null
         // let _res = await requestJson("POST", "/chat/join", true, { "id": _chId })
         // res = ylk.Chats[_chId]

@@ -54,7 +54,7 @@
 }
 
 .status-popup { 
-    display: none; /* TODO: Cange to 'flex' */
+    display: block; /* TODO: Cange to 'flex' */
     position: fixed;
     z-index: 9; /* Sit on top */
     left: 0;
