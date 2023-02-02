@@ -45,8 +45,8 @@ type profile struct {
 }
 
 func messageCreate(db *sql.DB, time time.Time, message string, from string, to string) (id string) {
-
-	sqlStatement := fmt.Sprintf(`INSERT INTO chats."%v" (time, message, event, user_id)
+	to = pq.QuoteIdentifier(to)
+	sqlStatement := fmt.Sprintf(`INSERT INTO chats.%v (time, message, event, user_id)
 								VALUES ($1, $2, $3, $4)
 								RETURNING id`, strings.ToUpper(to))
 	err := db.QueryRow(sqlStatement, time, message, "chat_message", from).Scan(&id)
@@ -251,7 +251,7 @@ func chatJoin(db *sql.DB, userID string, chatID string) (chat, error) {
 		}
 	default:
 		logger.LogColor("DATABASE", "Error in ChatJoin")
-		err = fmt.Errorf("err")
+		_status = fmt.Errorf("err")
 	}
 	return _chat, _status
 	// sqlUserJoin := `

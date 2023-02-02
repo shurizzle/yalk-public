@@ -1,5 +1,5 @@
 import { NewDMIcon, StatusPopup } from "./elements.js"
-
+import * as settings from "./settings.js"
 // **** User ****
 class User {
     constructor(id, username, display_name, color, status, statusText, isAdmin, joined_chats, isOnline) {
@@ -13,8 +13,16 @@ class User {
         this['joined_chats'] = joined_chats
         this['isOnline'] = isOnline
     }
-    // get status() {return this.status}
-    // set status(s) {this.status = s}
+    // get isOnline() {return this.isOnline}
+    // /**
+    //  * @param {bool} s Set user description
+    //  */
+    // set isOnline(s) {
+    //     console.info("Socio sto settando")
+    //     this.isOnline = s
+    //     let statusBadge = document.querySelector('#user-profile-' + this.user_id + " > .status-badge")
+    //         statusBadge.src = 'static/images/' + this.status + '.png'
+    // }
     // updateValues() {
     //     var instance = this
     //     $.ajax({
@@ -56,34 +64,55 @@ export function UserClass(res) {
     if (res["joined_chats"] != null) { joinedChats = res["joined_chats"] }
     return new User(userId, username, displayName, color, status, statusText, isAdmin, joinedChats, isOnline)
 }
+// customElements.define('user-profile', settings.Profile)
 
-export function UserRow(current_user, userData) {
-    var user_row = document.createElement('div')
-    var user_avatar = document.createElement('img')
-    user_avatar.addEventListener('click', () => {
-        window.location.replace('/profile')
+export function UserRow(isSelf, userData) {
+    var row = document.createElement('div')
+    var avatar = document.createElement('img')
+    avatar.addEventListener('click', () => {
+        ylk.Context = "PROFILE"
+        const hTitle = document.getElementById("header-title")
+        let hDelete = document.getElementById("header-delete")
+        let receiveArea = document.getElementById("receive")
+        let oldBtn = document.getElementById(ylk.Context)
+
+        receiveArea.innerHTML = ''
+        document.querySelector("#send").value = ''
+        hTitle.innerHTML = 'Settings'
+        hDelete.style.visibility = "hidden"
+
+        // oldBtn.style.visibility = 'hidden' // ! remove active class
+        document.querySelector("#send").style.visibility = "hidden"
+        document.querySelector(".chat-grid-divider").style.visibility = "hidden"
+
+
+        let profile = settings.profile(userData)
+
+        // profile.querySelector('#picture-submit').addEventListener('click', )
+        receiveArea.appendChild(profile)
+
     })
-    user_avatar.className = 'avatar'
-    user_avatar.src = 'static/data/user_avatars/' + userData.user_id + '/avatar.png'
+    avatar.className = 'avatar'
+    avatar.src = 'static/data/user_avatars/' + userData.user_id + '/avatar.png'
 
-    user_avatar.style.borderColor = userData.color
+    avatar.style.borderColor = userData.color
 
 
-    var status_dot = document.createElement('img')
-    status_dot.className = 'status-badge'
+    var statusDot = document.createElement('img')
+    statusDot.className = 'status-badge'
     if (userData.isOnline == false) {
-        status_dot.src = 'static/images/offline.png'
+        statusDot.src = 'static/images/offline.png'
     } else {
-        status_dot.src = 'static/images/' + userData.status + '.png'
+        statusDot.src = 'static/images/' + userData.status + '.png'
     }
 
     var username = document.createElement('span')
     username.className = 'username'
     username.innerText = userData.display_name
 
-    if (current_user) {
-        user_row.id = 'currentUser'
-        user_row.classList = 'profile-row'
+    if (isSelf) {
+        row.id = 'currentUser'
+        row.classList = 'profile-row'
 
         // var avatar_link = document.createElement('a')
         // avatar_link.href = '/user'
@@ -103,25 +132,25 @@ export function UserRow(current_user, userData) {
         logout_logo.classList = 'fa-solid fa-right-from-bracket'
         logout_link.append(logout_logo)
 
-        status_btn.appendChild(status_dot)
+        status_btn.appendChild(statusDot)
 
 
-        user_row.appendChild(user_avatar)
-        user_row.appendChild(status_btn)
-        user_row.appendChild(username)
-        user_row.appendChild(logout_link)
+        row.appendChild(avatar)
+        row.appendChild(status_btn)
+        row.appendChild(username)
+        row.appendChild(logout_link)
 
     }
     else {
-        user_row.id = 'user-profile-' + userData.user_id
-        user_row.classList = 'profile-row'
-        user_row.appendChild(user_avatar)
-        user_row.appendChild(status_dot)
-        user_row.appendChild(username)
+        row.id = 'user-profile-' + userData.user_id
+        row.classList = 'profile-row'
+        row.appendChild(avatar)
+        row.appendChild(statusDot)
+        row.appendChild(username)
         var dmIcon = NewDMIcon(userData.user_id)
-        user_row.appendChild(dmIcon)
+        row.appendChild(dmIcon)
     }
 
-    return user_row
+    return row
 }
 

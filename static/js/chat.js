@@ -1,4 +1,4 @@
-import { MessageRow, NewBubbleText, NewHashtagText } from "./elements.js";
+import { messageRow, NewBubbleText, NewHashtagText } from "./elements.js";
 
 // **** CHAT ****
 class chatroom {
@@ -10,6 +10,7 @@ class chatroom {
         this['name'] = name
         this['users'] = users
         this['messages'] = messages
+        this['last'] = 0
     }
 }
 
@@ -67,38 +68,22 @@ export function Scroll(el) { //? GRAPHIC ELEMENT??
 }
 
 export function Change(chat) {
+    // * Switch global context to current chat id if empty
     if (ylk.Context == '') { ylk.Context = chat.id }
+    ylk.Context = chat.id
 
+    let receiveArea = document.getElementById("receive")
     let ctrChans = document.getElementById('sidebar-channels')
     let ctrDms = document.getElementById('sidebar-dms')
     let oldBtn = document.getElementById(ylk.Context)
-    let newBtn = chat.html_button
-
-    ylk.Context = chat.id
-
-    document.querySelector("#send").value = ""
-    document.querySelector("#receive").innerHTML = ''
-
-
-    if (oldBtn != undefined) {
-        oldBtn.classList.remove('active')
-    }
-    if (chat.type == "dm" && ctrDms.children[chat.id] == undefined) {
-        ctrDms.append(newBtn)
-    }
-    if ((chat.type == "channel_public" || chat.type == "channel_private") && ctrChans.children[chat.id] == undefined) {
-        ctrChans.append(newBtn)
-    }
-
-    newBtn.classList.add('active')
-
     let hdr = document.getElementById("chat-header")
     let hTitle = document.getElementById("header-title")
-    hTitle.innerHTML = ''
-
     let hDelete = document.getElementById("header-delete")
-    let new_hDelete = hDelete.cloneNode(true)
-    new_hDelete.addEventListener('click', function (e) {
+    let newhDelete = hDelete.cloneNode(true)
+    let chatMessage = []
+
+    // * Defining delete function with input chat data
+    newhDelete.addEventListener('click', function (e) {
         let data = {
             "event": "chat_delete",
             "id": chat.id,
@@ -118,9 +103,30 @@ export function Change(chat) {
         delete ylk.Chats[data.id]
     })
 
-    hdr.replaceChild(new_hDelete, hDelete)
-    let receive_area = document.getElementById("receive")
+    // * Empty send, receive and header areas
+    let send = document.getElementById('send')
+    send.value = ""
+    send.style.visibility = "visible"
+    document.querySelector("#receive").innerHTML = ''
+    hTitle.innerHTML = ''
 
+    // * Create new chat button
+    // * Remove active status from previous button
+    let newBtn = chat.html_button
+    newBtn.classList.add('active')
+    if (oldBtn != undefined) {
+        oldBtn.classList.remove('active')
+    }
+
+    // * Appends to DOM buttons if not already there
+    if (chat.type == "dm" && ctrDms.children[chat.id] == undefined) {
+        ctrDms.append(newBtn)
+    }
+    if ((chat.type == "channel_public" || chat.type == "channel_private") && ctrChans.children[chat.id] == undefined) {
+        ctrChans.append(newBtn)
+    }
+
+    // * Determining chat type for custom icon in header
     switch (chat.type) {
         case "channel_public":
         case "channel_private":
@@ -134,19 +140,21 @@ export function Change(chat) {
             if (i > -1) {
                 chat.users.splice(i, 1)
             }
-            let usrDN = []
+            let displayName = []
             chat.users.forEach(e => {
-                usrDN.push(ylk.Users[e].display_name)
+                displayName.push(ylk.Users[e].display_name)
             })
-            let icoDm = NewBubbleText(usrDN)
+            let icoDm = NewBubbleText(displayName)
             hTitle.appendChild(icoDm.icon_bubble)
             hTitle.appendChild(icoDm.bubble_text)
             break
     }
-    let chat_messages = []
+
+    hdr.replaceChild(newhDelete, hDelete)
+
     if (chat.messages === null || chat.messages === undefined || Object.keys(chat.messages).length === 0) {
-        let message = MessageRow("", 0, "server_message", "RosmoBOT", "Empty", true, "", "0")
-        chat_messages.push(message)
+        let message = messageRow("", 0, "server_message", "RosmoBOT", "Empty", true, "", "0")
+        chatMessage.push(message)
     } else {
         let lm = null
         for (const [key, value] of Object.entries(chat.messages)) {
@@ -154,15 +162,17 @@ export function Change(chat) {
             let display_name = ylk.Users[user_id].display_name
             let isAdmin = ylk.Users[user_id].isAdmin
             let color = ylk.Users[user_id].color
-            let message = MessageRow(lm, user_id, value.type, display_name, value.text, isAdmin, color, value.time, key)
-            chat_messages.push(message)
+            let message = messageRow(lm, user_id, value.type, display_name, value.text, isAdmin, color, value.time, key)
+            chatMessage.push(message)
             lm = value
         }
+        chat.last = lm.message_id
     }
-    chat_messages.forEach(element => {
-        receive_area.appendChild(element)
+
+    chatMessage.forEach(element => {
+        receiveArea.appendChild(element)
     })
-    Scroll(receive_area)
+    Scroll(receiveArea)
 }
 
 export function Open(chType, chName, chUsers, srvData, _chId) {

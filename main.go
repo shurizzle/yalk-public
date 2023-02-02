@@ -130,6 +130,7 @@ func main() {
 	}
 
 	var err error
+	logger.LogColor("WEBSRV", "Starting HTTP and HTTPS listeners..")
 	activeServer.httpServer, err = startHTTPServer(netConf, dbConf)
 	if err != nil {
 		panic(fmt.Sprintf("Instance cannot start HTTP Server: %v", err))
@@ -162,7 +163,7 @@ func (server *server) connect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	conn, err := websocket.Accept(w, r, nil) //&websocket.AcceptOptions{})
+	conn, err := websocket.Accept(w, r, &websocket.AcceptOptions{CompressionMode: websocket.CompressionNoContextTakeover})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		logger.LogColor("WEBSOCK", fmt.Sprintf("Can't start accepting - %s", r.RemoteAddr))
@@ -170,6 +171,7 @@ func (server *server) connect(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Close(websocket.StatusInternalError, "Client disconnected")
 
+	conn.SetReadLimit(2097152) // 2Mb in bytes
 	notify := make(chan bool)
 
 	client := &websocketClient{
@@ -195,7 +197,8 @@ func (server *server) connect(w http.ResponseWriter, r *http.Request) {
 		}()
 	Run:
 		for {
-			t, msg, err := conn.Read(r.Context())
+			t, payload, err := conn.Read(r.Context())
+			fmt.Printf("Payload len: %v\n", len(payload))
 			if err != nil && err != io.EOF {
 				statusCode := websocket.CloseStatus(err)
 				if statusCode == websocket.StatusGoingAway {
@@ -208,7 +211,7 @@ func (server *server) connect(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 			if t.String() == "MessageText" && err == nil {
-				err = server.broadcast(msg, session.UserID)
+				err = server.handlePayload(payload, session.UserID)
 				if err != nil {
 					log.Printf("Sender - errors in broadcast: %v", err)
 					// wg.Done()
@@ -277,7 +280,7 @@ func (server *server) connect(w http.ResponseWriter, r *http.Request) {
 	}
 	payload, err := json.Marshal(_payload)
 
-	err = server.broadcast(payload, session.UserID)
+	err = server.handlePayload(payload, session.UserID)
 	if err != nil {
 		log.Printf("Sender - error in sending user connection: %v", err)
 		// wg.Done()
@@ -300,7 +303,7 @@ func (server *server) connect(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("Timeout in initial payload: %v\n", err)
 	}
-	log.Printf("OK - Full data sent to to ID: %v\n", session.UserID)
+	log.Printf("OK - Full data sent to ID: %v\n", session.UserID)
 
 	wg.Wait()
 
@@ -323,7 +326,7 @@ func (server *server) connect(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Printf("Error Marshaling user_disconn payload")
 		}
-		err = server.broadcast(payload, session.UserID)
+		err = server.handlePayload(payload, session.UserID)
 		if err != nil {
 			fmt.Printf("Error routing user_disconn payload")
 		}

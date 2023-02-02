@@ -383,7 +383,7 @@ export function WhiteSpacer() {
     return spacer
 }
 
-export function MessageRow(last_msg, user_id, type_message, display_name, text, isAdmin, color, _time, message_id) {
+export function messageRow(lastMsg, user_id, type_message, display_name, text, isAdmin, color, _time, message_id) {
     let message = new DocumentFragment()
 
     var message_row = document.createElement('div')
@@ -430,20 +430,20 @@ export function MessageRow(last_msg, user_id, type_message, display_name, text, 
         message_time.innerText = locale_date + ' - ' + locale_time
         message_time.className = "timestamp"
 
-        if (last_msg != null || last_msg != undefined) {
-            var lm_from = last_msg.from
-            var lm_unix_time = Date.parse(last_msg.time)
+        if (lastMsg != null || lastMsg != undefined) {
+            var lm_from = lastMsg.from
+            var lm_unix_time = Date.parse(lastMsg.time)
 
             if (lm_from == user_id && unix_time < (lm_unix_time + 600000) && type_message != "server_message") {
                 var l_container = document.createElement('span')
                 l_container.className = "timestamp-avatar"
                 l_container.innerText = locale_time
                 l_container.display = 'hidden'
-                // l_container.className = "avatar"
                 userDisplayName.style.display = 'none'
                 message_time.style.display = 'none'
             } else {
                 var l_container = document.createElement('img')
+                l_container.id = "picture-avatar"
                 l_container.className = "avatar"
                 l_container.src = "/static/data/user_avatars/" + user_id + "/avatar.png"
                 l_container.style.borderColor = color
@@ -456,6 +456,7 @@ export function MessageRow(last_msg, user_id, type_message, display_name, text, 
                 message_time.style.display = 'none'
             } else {
                 var l_container = document.createElement('img')
+                l_container.id = "picture-avatar"
                 l_container.className = "avatar"
                 l_container.src = "/static/data/user_avatars/" + user_id + "/avatar.png"
                 l_container.style.borderColor = color

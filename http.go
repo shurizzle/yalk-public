@@ -20,7 +20,6 @@ type httpServer struct {
 }
 
 func startHTTPServer(netConf configNetwork, dbConf postgreConfig) (*httpServer, error) {
-	logger.LogColor("WEBSRV", "Starting HTTP and HTTPS listeners..")
 
 	httpServer := &httpServer{
 		config: netConf,
@@ -52,7 +51,7 @@ func startHTTPServer(netConf configNetwork, dbConf postgreConfig) (*httpServer, 
 
 	go func() {
 		logger.LogColor("WEBSRV", "HTTPS listener started")
-		err := http.ListenAndServeTLS(httpsAddr, "localhost.crt", "localhost.key", nil)
+		err := http.ListenAndServeTLS(httpsAddr, "./certs/localhost.crt", "./certs/localhost.key", nil)
 		if err != nil {
 			// panic(fmt.Sprintf("Error listening HTTPS: %v", err))
 			panic(err)
@@ -63,15 +62,7 @@ func startHTTPServer(netConf configNetwork, dbConf postgreConfig) (*httpServer, 
 	return httpServer, nil
 }
 
-func favicon(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "static/images/favicon.ico")
-}
-func redirectToTLS(w http.ResponseWriter, r *http.Request) {
-	logger.LogColor("HTTPS", "Redirecting HTTP requests to HTTPS")
-	http.Redirect(w, r, ":443", http.StatusSeeOther)
-}
-
-func handleClientData(w http.ResponseWriter, renderTemplate bool, _fileName string, _payload any) {
+func response(w http.ResponseWriter, renderTemplate bool, _fileName string, _payload any) {
 	if !renderTemplate {
 		switch _payload.(type) {
 		case dataPayload:
@@ -134,9 +125,31 @@ func rootPage(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/chat", http.StatusFound)
 }
 
+func chatPage(w http.ResponseWriter, r *http.Request) {
+	logger.LogColor("HTTPS", fmt.Sprintf("Chat requested from %s", r.RemoteAddr)) // TODO Write Logger() function in core.go
+	defer r.Body.Close()
+	session, err := sessionValidate(w, r, activeServer.dbconn)
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
+	_, err = userRead(activeServer.dbconn, session.UserID, true)
+	if err != nil {
+		logger.LogColor("HTTPS", "User not found, general error.")
+	}
+
+	// var channel_id string
+	// Error_Code stores the error code from URL Query, err in this case is a clean case so just display the context
+
+	// if r.URL.Query().Get("id") == "" {
+	// 	channel_id = r.URL.Query().Get("id")
+	// }
+
+	response(w, true, "base.html", nil)
+}
+
 func loginPage(w http.ResponseWriter, r *http.Request) {
 	logger.LogColor("HTTPS", fmt.Sprintf("Login requested from %s", r.RemoteAddr)) // TODO Write Logger() function in core.go
-	// event := "login"
 	defer r.Body.Close()
 
 	//TODO: Change the error query with MessageEvent: https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent
@@ -223,29 +236,6 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func chatPage(w http.ResponseWriter, r *http.Request) {
-	logger.LogColor("HTTPS", fmt.Sprintf("Chat requested from %s", r.RemoteAddr)) // TODO Write Logger() function in core.go
-	defer r.Body.Close()
-	session, err := sessionValidate(w, r, activeServer.dbconn)
-	if err != nil {
-		http.Redirect(w, r, "/login", http.StatusFound)
-		return
-	}
-	_, err = userRead(activeServer.dbconn, session.UserID, true)
-	if err != nil {
-		logger.LogColor("HTTPS", "User not found, general error.")
-	}
-
-	// var channel_id string
-	// Error_Code stores the error code from URL Query, err in this case is a clean case so just display the context
-
-	// if r.URL.Query().Get("id") == "" {
-	// 	channel_id = r.URL.Query().Get("id")
-	// }
-
-	handleClientData(w, true, "base.html", nil)
-}
-
 func profilePage(w http.ResponseWriter, r *http.Request) {
 	logger.LogColor("HTTPS", fmt.Sprintf("Profile requested from %s", r.RemoteAddr)) // TODO Write Logger() function in core.go
 	defer r.Body.Close()
@@ -268,7 +258,7 @@ func profilePage(w http.ResponseWriter, r *http.Request) {
 		Event:   event,
 		Data:    data,
 	}
-	handleClientData(w, true, "profile.html", payload)
+	response(w, true, "profile.html", payload)
 }
 
 func logoutPage(w http.ResponseWriter, r *http.Request) {
@@ -294,27 +284,10 @@ func logoutPage(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/login", http.StatusFound)
 }
 
-func dbLogin(db *sql.DB, username string) (creds credentials) {
-	// var id uint8
-	sqlStatement := `SELECT id, username, password FROM login_users WHERE username=$1;`
-	var id string
-	var hash string
-
-	row := db.QueryRow(sqlStatement, username)
-	// Here means: it assigns err with the row.Scan()
-	// then "; err" means use "err" in the "switch" statement
-	switch err := row.Scan(&id, &username, &hash); err {
-	case sql.ErrNoRows:
-		logger.LogColor("DATABASE", "No rows were returned!")
-		return
-	case nil:
-		creds := credentials{ //! WRONG!
-			ID:       id,
-			Username: username,
-			Password: hash,
-		}
-		return creds
-	default:
-		return
-	}
+func favicon(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "static/images/favicon.ico")
+}
+func redirectToTLS(w http.ResponseWriter, r *http.Request) {
+	logger.LogColor("HTTPS", "Redirecting HTTP requests to HTTPS")
+	http.Redirect(w, r, ":443", http.StatusSeeOther)
 }

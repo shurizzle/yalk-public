@@ -1,18 +1,16 @@
 import * as Chat from "./chat.js"
-import { UserRow, UserClass, } from "./user.js";
+import { UserClass, } from "./user.js";
 import {
-    showModal, MessageRow, NewResultHeader,
+    showModal, messageRow, NewResultHeader,
     WhiteSpacer, noResultRow, elementsHide, UserButton
 } from "./elements.js";
-import { DebugBox, DragElement } from "./ngula/debug.js";
-
-
+import { ready } from "./utils.js";
+import { handleEventsQueue } from "./queue.js";
+import { profile } from "./settings.js";
 // TODO: For ConnStatus use WebSocket readyState?
 
 // (() => {
 //     let ylk = {
-
-
 //     waInit()
 // })()
 
@@ -27,138 +25,38 @@ window.ylk = {
     Sock: '',
 }
 
-
-window.addEventListener('DOMContentLoaded', function () {
-    init()
-})
-
-function handleEventsQueue(payload) {
-    // if (ylk.Queued.length == 0) {
-    //     return
-    // }
-    let sb = document.getElementById('sidebar')
-    let ctrUsers = document.getElementById('server-users')
-
-    ylk.Queued.forEach((item, index) => {
-        if (item.event != payload.event) {
-            return
-        }
-        let msg = payload.data
-        if (payload.event == "init") {
-            for (const [k, v] of Object.entries(msg)) {
-                switch (k) {
-                    case "users":
-                        for (const [key, value] of Object.entries(v)) {
-                            let _cu = UserClass(value)
-                            ylk.Users[key] = value
-                            let _usrRow = UserRow(false, _cu)
-                            ctrUsers.appendChild(_usrRow)
-                        }
-                        break
-                    case "self":
-                        ylk.Self = UserClass(v)
-                        sb.appendChild(UserRow(true, v))
-                        if (ylk.Self.isAdmin == "true") {
-                            let debugBox = DebugBox()
-                            document.body.prepend(debugBox)
-                            // document.body.appendChild(debugBox)
-                            DragElement(debugBox)
-                        }
-                        break
-                    case "settings":
-                        for (const [key, value] of Object.entries(v)) {
-                            ylk.Settings[key] = value
-                        }
-                        break
-                    case "chats":
-                        for (const [key, value] of Object.entries(v)) {
-                            ylk.Chats[key] = Chat.New(value, msg["users"], msg["self"].user_id)
-                        }
-                        break
-                }
-            }
-            ylk.Self.joined_chats.forEach(element => {
-                let chat = ylk.Chats[element]
-                switch (chat.type) {
-                    case "channel_public":
-                    case "channel_private":
-                        document.querySelector('#sidebar-channels').append(chat.html_button)
-                        break
-                    case "dm":
-                        document.querySelector('#sidebar-dms').append(chat.html_button)
-                        break
-                }
-            })
-            Chat.Change(ylk.Chats[ylk.Settings.default_channel])
-            document.querySelector('#loading-screen').style.display = 'none'
-            return
-        }
-
-        if (payload.event == "chat_create") {
-            if (payload.data.type != item.type && payload.origin != ylk.Self.user_id && payload.data.name != item.name) {
-                return
-            }
-            ylk.Queued.splice(index, 1)
-            ylk.Chats[payload.data.id] = Chat.New(payload.data, ylk.Users, ylk.Self.user_id)
-            Chat.Change(ylk.Chats[payload.data.id])
-            return
-        }
-        if (payload.event == "chat_delete") {
-            if (payload.data.type != item.type && payload.origin != ylk.Self.user_id && payload.data.name != item.name) {
-                return
-            }
-            ylk.Queued.splice(index, 1)
-            Chat.Change(ylk.Chats[ylk.Settings.default_channel])
-            return
-        }
-        if (payload.event == "chat_join") {
-            let chat = ylk.Chats[payload.data.id]
-            if (payload.data.id == item.id) {
-                ylk.Self.joined_chats.push(payload.data.id)
-            }
-            if (payload.data.type == "channel_public" || payload.data.type == "channel_private") {
-                document.querySelector('#sidebar-channel}}s').append(chat.html_button)
-            } else {
-                document.querySelector('#sidebar-dms').append(chat.html_button)
-            }
-            Chat.Change(chat)
-        }
-    })
-}
-
 async function init() {
-    const data = {"event": "init"}
+    const data = { "event": "init" }
     ylk.Queued.push(data)
     let btnChans = document.getElementById("btnChans")
     let btnDms = document.getElementById("btnDms")
 
     // **** EventListener loader ****
-
     window.addEventListener("beforeunload", function (e) {
         ylk.Sock.terminate()
     }, false);
 
-    window.addEventListener('load', function () {
-        let row_added = false
-        // !! CHANGE  !!
-        // $("#user-profile").on('submit', function (e) {
-        //     e.preventDefault(); // avoid to execute the actual submit of the form.
-        //     $.ajax({
-        //         type: $(this).attr('method'),
-        //         url: $(this).attr('action'),
-        //         xhrFields: {
-        //             withCredentials: true
-        //         },
-        //         data: $(this).serialize(), // serializes the form's elements.
-        //         success: function (response) {
-        //             console.log('Succes: ' + response)
-        //         },
-        //         error: function (xhr) {
-        //             console.log(xhr)
-        //         }
-        //     });
-        // });
-    })
+    // window.addEventListener('load', function () {
+    //     let row_added = false
+    //     // !! CHANGE  !!
+    //     // $("#user-profile").on('submit', function (e) {
+    //     //     e.preventDefault(); // avoid to execute the actual submit of the form.
+    //     //     $.ajax({
+    //     //         type: $(this).attr('method'),
+    //     //         url: $(this).attr('action'),
+    //     //         xhrFields: {
+    //     //             withCredentials: true
+    //     //         },
+    //     //         data: $(this).serialize(), // serializes the form's elements.
+    //     //         success: function (response) {
+    //     //             console.log('Succes: ' + response)
+    //     //         },
+    //     //         error: function (xhr) {
+    //     //             console.log(xhr)
+    //     //         }
+    //     //     });
+    //     // });
+    // })
 
     // * Sidebar newChan button
     btnChans.addEventListener('click', () => {
@@ -199,7 +97,6 @@ async function init() {
         search(e, ylk.Self)
     })
     waEvent()
-
 }
 
 // * Handles event received by verifying succesful return of user actions
@@ -223,110 +120,127 @@ function waEvent() {
         handleEventsQueue(payload)
 
         // * Handling received payload
-        let msg = payload.data
-        switch (payload.event) {
-            // !!!! DEBUG !!!! //
-            case "ping":
-                let calc = Date.now() - payload.data
-                document.querySelector("#ping").innerText = calc + "ms"
+        let originID = payload.origin
+        let payloadData = payload.data
+        let originUser = ylk.Users[originID]
+        let originStatusBadge = document.querySelector('#user-profile-' + originID + " > .status-badge")
 
-            case "user_conn":
-                let idConn = payload.origin
-                let userConn = payload.data
-                if (ylk.Users[idConn] == undefined && ylk.Self != "") {
-                    ylk.Users[idConn] = UserClass(payload.data)
-                    let statusBadge = document.querySelector('#user-profile-' + idConn + " > .status-badge")
-                    statusBadge.src = 'static/images/' + userConn.status + '.png'
-                }
-
-            case "user_disconn":
-                let idDisconn = payload.origin
-                if (ylk.Users[idDisconn] !== undefined && ylk.Self.user_id != idDisconn) {
-                    ylk.Users[idDisconn].status = "offline"
-                    let statusBadge = document.querySelector('#user-profile-' + idDisconn + " > .status-badge")
-                    statusBadge.src = 'static/images/offline.png'
-                }
-                break
-            case "user_update":
-                let idUpd = payload.origin
-                let userUpd = payload.data
-                if (ylk.Users[idUpd] === undefined) {
-                    break
-                }
-                ylk.Users[idUpd] = UserClass(userUpd)
-                let statusBadge = document.querySelector('#user-profile-' + idUpd + " > .status-badge")
-                statusBadge.src = 'static/images/' + userUpd.status + '.png'
-
-                if (idUpd === ylk.Self.user_id) {
-                    let usrRowStatus = document.querySelector("#btnPopStatus > .status-badge")
-                    usrRowStatus.src = 'static/images/' + userUpd.status + '.png'
-                    elementsHide()
-                }
-                break
-
-            case "chat_message":
-                let lastMessageID = document.getElementById("receive").lastElementChild.id
-                let lastMessage = ylk.Chats[msg.to].messages[lastMessageID]
-                let sender = ylk.Users[msg.from]
-
-                let message_row = MessageRow(lastMessage, msg.from, msg.type, sender.display_name, msg.text, sender.admin, sender.color, msg.time, msg.message_id)
-
-                // Saving message data globally
-                ylk.Chats[msg.to].messages[msg.message_id] = {
-                    "message_id": msg.message_id,
-                    "from": msg.from,
-                    "to": msg.to,
-                    "type": msg.type,
-                    "text": msg.text,
-                    "time": msg.time
-                }
-
-                let receive_area = document.getElementById("receive")
-                if (ylk.Context != '' && ylk.Context == msg.to) {
-                    receive_area.append(message_row)
-                    if (msg.from != ylk.Self.user_id) {
-                        audio.play()
-                    }
-                    Chat.Scroll(receive_area)
-                }
-                break
-
-            case "chat_create":
-                let ctrChans = document.getElementById('sidebar-channels')
-                let ctrDms = document.getElementById('sidebar-dms')
-                let chatData = payload.data
-                let res = Chat.New(chatData, ylk.Users, origin)
-                ylk.Chats[res.id] = res
-
-                const selfIndex = res.users.indexOf(ylk.Self.user_id)
-                if (selfIndex > -1) {
-                    ylk.Self.joined_chats.push(res.id)
-                    if (res.type == "dm" && ctrDms.children[res.id] == undefined) {
-                        ctrDms.append(res.html_button)
-                    }
-                    if ((res.type == "channel_public" || res.type == "channel_private") && ctrChans.children[res.id] == undefined) {
-                        ctrChans.append(res.html_button)
-                    }
-                }
-                break
-
-            case "chat_delete":
-                let btnChat = document.getElementById(payload.data)
-                if (btnChat != undefined) {
-                    btnChat.remove()
-                }
-                const index = ylk.Self.joined_chats.indexOf(payload.data)
-                if (index > -1) {
-                    ylk.Self.joined_chats.splice(index, 1)
-                }
-                delete ylk.Chats[msg.data]
-                Chat.Change(ylk.Chats[ylk.Settings.default_channel])
-                break
-            default:
-                break
+        if (payload.event === "ping") {
+            let calc = Date.now() - payload.data
+            document.querySelector("#ping").innerText = calc + "ms"
+        }
+        if (payload.event === "user_new") {
+            let user = payload.data
+            ylk.Users[idConn] = UserClass(user)
+        }
+        if (payload.event === "user_conn") {
+            if (ylk.Self == "" || ylk.Self.user_id == originID) {
+                return
+            }
+            ylk.Users[originID].isOnline = true
+            originStatusBadge.src = '/static/images/' + originUser.status + '.png'
         }
 
-    };
+        if (payload.event === "user_disconn") {
+            if (ylk.Self == "" || ylk.Self.user_id == originID) {
+                return
+            }
+            originUser.isOnline = false
+            originStatusBadge.src = '/static/images/offline.png'
+            return
+        }
+
+        if (payload.event === "user_update") {
+            let id = payload.origin
+            let userData = payload.data
+            const selectorId = "#user-profile-" + id
+
+            if (ylk.Users[id] === undefined) {
+                return
+            }
+            ylk.Users[id] = UserClass(userData)
+            originStatusBadge.src = '/static/images/' + userData.status + '.png'
+
+            // TODO: Check userUpdate() method on user class
+            if (id === ylk.Self.user_id) {
+                if (ylk.Context === "PROFILE"){
+                    document.querySelector("#profile-avatar").src = "/static/data/user_avatars/" + id + "/avatar.png?" + new Date().getTime()
+                }
+            document.querySelector("#currentUser > .avatar").src = "/static/data/user_avatars/" + id + "/avatar.png?" + new Date().getTime()
+            }
+            document.querySelector(selectorId + " > .avatar").src = "/static/data/user_avatars/" + id + "/avatar.png?" + new Date().getTime()
+
+            //TODO: Split in function
+            if (id === ylk.Self.user_id) {
+                let usrRowStatus = document.querySelector("#btnPopStatus > .status-badge")
+                usrRowStatus.src = '/static/images/' + userData.status + '.png'
+                elementsHide()
+            }
+        }
+
+        if (payload.event === "chat_message") {
+            let lastMessageID = document.getElementById("receive").lastElementChild.id
+            let lastMessage = ylk.Chats[payloadData.to].messages[lastMessageID]
+            let sender = ylk.Users[payloadData.from]
+            let message_row = messageRow(lastMessage, payloadData.from, payloadData.type, sender.display_name, payloadData.text, sender.admin, sender.color, payloadData.time, payloadData.message_id)
+            let receive_area = document.getElementById("receive")
+
+            // Saving message data globally
+            ylk.Chats[payloadData.to].messages[payloadData.message_id] = {
+                "message_id": payloadData.message_id,
+                "from": payloadData.from,
+                "to": payloadData.to,
+                "type": payloadData.type,
+                "text": payloadData.text,
+                "time": payloadData.time
+            }
+
+            if (ylk.Context != '' && ylk.Context == payloadData.to) {
+                receive_area.append(message_row)
+                if (payloadData.from != ylk.Self.user_id) {
+                    audio.play()
+                }
+                Chat.Scroll(receive_area)
+            }
+        }
+
+        if (payload.event === "chat_create") {
+            let ctrChans = document.getElementById('sidebar-channels')
+            let ctrDms = document.getElementById('sidebar-dms')
+            let chat = Chat.New(payloadData, ylk.Users, origin)
+            const selfIndex = chat.users.indexOf(ylk.Self.user_id)
+
+            ylk.Chats[chat.id] = chat
+
+            if (selfIndex > -1) {
+                ylk.Self.joined_chats.push(chat.id)
+
+                if (chat.type == "dm" && ctrDms.children[chat.id] == undefined) {
+                    ctrDms.append(chat.html_button)
+                }
+                if ((chat.type == "channel_public" || chat.type == "channel_private") && ctrChans.children[chat.id] == undefined) {
+                    ctrChans.append(chat.html_button)
+                }
+            }
+        }
+
+        if (payload.event === "chat_delete") {
+            let btnChat = document.getElementById(payload.data)
+
+            if (btnChat != undefined) {
+                btnChat.remove()
+            }
+
+            const index = ylk.Self.joined_chats.indexOf(payload.data)
+            if (index > -1) {
+                ylk.Self.joined_chats.splice(index, 1)
+            }
+
+            delete ylk.Chats[payloadData.data]
+            
+            Chat.Change(ylk.Chats[ylk.Settings.default_channel])
+        }
+    }
 
     const send = document.getElementById("send")
     send.addEventListener("keydown", async function (key) {
@@ -418,3 +332,5 @@ function UserStatusUpdate(status) {
     ylk.Queued.push(data)
 
 }
+
+ready(init)

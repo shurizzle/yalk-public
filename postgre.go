@@ -7,6 +7,7 @@
 package main
 
 import (
+	"chat/logger"
 	"database/sql"
 	"fmt"
 
@@ -34,4 +35,29 @@ func connector(config postgreConfig) (db *sql.DB) {
 		panic(err)
 	}
 	return db
+}
+
+func dbLogin(db *sql.DB, username string) (creds credentials) {
+	// var id uint8
+	sqlStatement := `SELECT id, username, password FROM login_users WHERE username=$1;`
+	var id string
+	var hash string
+
+	row := db.QueryRow(sqlStatement, username)
+	// Here means: it assigns err with the row.Scan()
+	// then "; err" means use "err" in the "switch" statement
+	switch err := row.Scan(&id, &username, &hash); err {
+	case sql.ErrNoRows:
+		logger.LogColor("DATABASE", "No rows were returned!")
+		return
+	case nil:
+		creds := credentials{ //! WRONG!
+			ID:       id,
+			Username: username,
+			Password: hash,
+		}
+		return creds
+	default:
+		return
+	}
 }

@@ -1,47 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="static/css/main.css">
+<div id="profile-container" class="flex-container"> -->
+    <div class="box box-shadow box-flex-grow-2"> -->
+        <span class="box-title">Users<br /></span>
+        <span class="box-title">Profile picture<br /></span>
 
-        <script src="https://kit.fontawesome.com/406871c654.js" crossorigin="anonymous"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
-        <script type="module" src="static/js/app.js"></script>
-        <script type="module" src="static/js/elements.js"></script>
-        <script src="static/js/settings.js"></script>
-        <script src="static/js/ngula/sudo_v1.js"></script>
-        <title>Settings</title>
-</head>
-<body>
-        <div class="flex-container">
-                <div class="box box-shadow box-flex-grow-2">
-                        <span class="box-title">Users<br /></span>
-                        <span class="box-title">Profile picture<br /></span>
-                        <form id="user-profile" action="/user/update" method="POST">
-                                <!-- User settings<span visible="hidden">✅ Updated</span> -->
-                                <label for="display_name">Display name</label><br />
-                                <input type="color" id="color_pick" autocomplete="off" name="color_pick">
-                                <input type="text" id="display_name" autocomplete="off" name="display_name"><br /><br />
-                                <label for="color_pick">Badge color</label><br />
-                                <input class="wide-button" type="submit" value="Update">
-
-                        </form>
-                        <form enctype="multipart/form-data" id="user-profile" action="/user/update/avatar"
-                                method="POST">
-                                <img src="static/data/user_avatars/default/avatar.png" alt="avatar"
-                                        class="avatar-profile"><br /><br />
-                                <input type="file" id="picture" name="picture"><br /><br />
-                                <input class="wide-button" type="submit" value="Update">
-                        </form>
-                </div>
-                <div id="user-modal" class="modal">
-                        <div class="modal-content">
-                        </div>
-                </div>
-                <script src="static/js/modal.js"></script>
-        </div>
-</body>
-
-</html>
+        <form id="user-profile" action="/user/update" method="POST">
+            <label for="display_name">Display name</label><br />
+            <input type="color" id="color_pick" autocomplete="off" name="color_pick">
+            <input type="text" id="display_name" autocomplete="off" name="display_name"><br /><br />
+            <label for="color_pick">Badge color</label><br />
+            <input class="wide-button" type="submit" value="Update">
+        </form>
+        
+        <img src="static/data/user_avatars/default/avatar.png" alt="avatar" class="avatar-profile"><br /><br />
+        <input type="file" id="picture" name="picture"><br /><br />
+        <input id="picture-submit" class="wide-button" type="submit" value="Update">
+    </div>
+</div>

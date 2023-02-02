@@ -65,7 +65,7 @@ func sessionValidate(w http.ResponseWriter, r *http.Request, db *sql.DB) (sessio
 	}
 	if session.isExpired() {
 		sessionDelete(db, token)
-		http.SetCookie(w, &http.Cookie{ // ! MA NO PORCO DIO, DELETECOOKIE NON SETCOOKIE
+		http.SetCookie(w, &http.Cookie{
 			Name:    "session_token",
 			Value:   "",
 			Expires: time.Now(),

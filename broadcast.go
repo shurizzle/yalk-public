@@ -2,14 +2,16 @@ package main
 
 import (
 	"chat/logger"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"time"
 )
 
-// Process and forward in the correct server channel the message received by the client
-func (server *server) broadcast(msg []byte, origin string) (err error) {
+// * Handle incoming user payload and process it eventually forwarding in the correct routine channels for other users to receive.
+func (server *server) handlePayload(msg []byte, origin string) (err error) {
 	var _req any
 	var _payload map[string]any
 	var payload dataPayload
@@ -21,7 +23,7 @@ func (server *server) broadcast(msg []byte, origin string) (err error) {
 		return err
 	}
 
-	// * Asserting req types
+	// Asserting request type
 	switch p := _req.(type) {
 	case map[string]any:
 		_payload = p
@@ -42,6 +44,14 @@ func (server *server) broadcast(msg []byte, origin string) (err error) {
 		Event:   event,
 	}
 
+	/*
+		* Event 'data_image' contains a base64 encoded image
+		* Max 2MB, Accepts: jpg, jpeg, png, gif
+		* Picture is decoded and saved in users directory`
+		? MIME Type in payload
+		TODO: Add
+	*/
+
 	// * Routing event to server
 	switch event {
 	case "pong":
@@ -61,6 +71,39 @@ func (server *server) broadcast(msg []byte, origin string) (err error) {
 			log.Println("Pong - can't decode timestamp")
 			return err
 		}
+	case "data_image":
+		value, ok := _payload["data"].(string)
+		if !ok {
+			log.Println("Listener - invalid picture type")
+			return err
+		}
+		stringEnc, err := base64.StdEncoding.DecodeString(value)
+		if err != nil {
+			log.Println("Listener - cannot take out mia nonna dal forno")
+			return err
+		}
+		fmt.Printf("Avatar payload lenght: %v", len(stringEnc))
+		f, err := os.OpenFile(fmt.Sprintf("static/data/user_avatars/%s/avatar.png", origin), os.O_WRONLY|os.O_CREATE, 0666)
+		if err != nil {
+			log.Println("Listener - can't open directory")
+			return err
+		}
+		payload.Event = "user_update"
+		payload.Data, err = userRead(server.dbconn, origin, false)
+		if err != nil {
+			log.Println("Listener - can't read userInfo")
+			return err
+		}
+		defer f.Close()
+		n, err := f.Write(stringEnc)
+		if err != nil {
+			log.Println("Listener - can't write file")
+			return err
+		}
+		fmt.Printf("Succesfully wrote %v bytes", n)
+
+		server.channels.Notify <- payload
+		return nil
 
 	case "chat_message":
 		var to, text string
