@@ -86,6 +86,7 @@ This application should **NEVER** be run and actively used in Production, rather
 ## Why does this exist?
 Well first, this was
 [![forthebadge](https://forthebadge.com/images/badges/built-with-resentment.svg)](https://forthebadge.com)
+
 It comes from the "dream" of wanting to make two people communicate over the internet I had back in 2008 when I was a very young boy looking, which I could never realize due to my lack of knowlege and it took nearly 15 years for me to learn the skills and logic that allowed me to finally achieve it.
 
 ## Bibliography
