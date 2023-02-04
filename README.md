@@ -3,9 +3,6 @@
 ![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white)![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)[![Twitch](https://img.shields.io/badge/Twitch-%239146FF.svg?style=for-the-badge&logo=Twitch&logoColor=white)](https://twitch.tv/CoderCatz)
 
 
-<ins>Readme is still **in progress**, this is just the barebone, apologies for the delays people ❤️</ins>
-
-
 ## What is this?
 
 Yalk is a self-hosted _"""Discord-like"""_ app, with many quotes as for now it only merely resembles the colours, but you get the intention.
@@ -48,38 +45,40 @@ Keep in mind this project was built with the idea of using the use of ***least p
 - PostgreSQL 13.0+ server/container
 
 ### Quickstart
+
+The setup should be pretty straightforward, feel free to open a PR should there be any issue with the procedure.
+
 1. [Install Docker](https://www.docker.com/products/docker-desktop/) for your OS
-2. Install Postgres 
-3. Clone this repo in a user owned directory
-    `git clone https://github.com/Revengeic3/yalk-public.git`
-4. 
-5. Edit the `Dockerfile` in the package root folder
-6. Generate certs and put them in .
-
-docker pull postgres
-docker run -p 5432:5432 -e POSTGRES_PASSWORD=yourpostgrespass postgres
-docker ps
-docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' container_id
-docker build -f Dockerfile -t revengeic3/yalk:latest .
-docker run -p 8080:80 -p 4443:443 revengeic3/yalk:latest
-
-
-#### PostgreSQL Database import
-psql -U postgres -h localhost -c "\i ~/GitHub/yalk-public/db_chat.sql" -d db_chat
-Run *psql* and execute the command:
-`\i {pathToSQLFile}`
-The output should show you all the SQL statement executed in order.
-
-### Running
+2. Open a Terminal/PowerShell
+3. Pull Postgres image
+  `docker pull postgres`
+1. Run the PostgresSQL Server container
+  `docker run -p 5432:5432 -e POSTGRES_PASSWORD=yourpostgrespass postgres` 
+1. Get the container ID
+   `docker ps`
+2. Verify the Docker network IP Address for the container
+  `docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' container_id`
+1. Clone this repo in a user owned directory and enter the folder once finished
+  `git clone https://github.com/Revengeic3/yalk-public.git`
+1. Edit the `Dockerfile` in the package root folder setting the correct configuration
+2. Generate certs and put them in **cert** folder
+3.  Build the container image
+  `docker build -f Dockerfile -t revengeic3/yalk:latest .`
+1.   Run the container
+  `docker run -p 8080:80 -p 4443:443 revengeic3/yalk:latest`
+1.   Open your browser to your set address using HTTPS
+2.   Login with Username 'admin' and Password 'admin'
+3.   Works! 🚀
 
 
-### Bugs
+### Know Bugs and To-Do's
 - [x] User goes offline automatically after 60 seconds
 - [ ] Remove named returns
 - [ ] Move functions to return errors and not interrupts the execution
 - [ ] Manage initialization and errors in a single place (main.go?)
+- [ ] Registration page (account creation)
 
-### To-Do 
+..and many more! :)
 
 ## Important note ⚠️
 This application should **NEVER** be run and actively used in Production, rather is to be intended **for educational purposes only**!
@@ -91,3 +90,6 @@ It comes from the "dream" of wanting to make two people communicate over the int
 
 ## Bibliography
 Peterson, A. (2019, November 19). *What's the point of GoLang pointers? everything you need to know!* Medium. Retrieved 2022, from https://medium.com/@annapeterson89/whats-the-point-of-golang-pointers-everything-you-need-to-know-ac5e40581d4d 
+
+..in progress
+<ins>Readme is still **in progress**, this is just the barebone, apologies for the delays people ❤️ I'm mostly working on the citations and bibliograpgy</ins>
