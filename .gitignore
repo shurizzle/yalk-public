@@ -77,3 +77,8 @@ Temporary Items
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,visualstudiocode,go
+
+certs/*
+Dockerfile.test
+.env
+.vscode/launch.json

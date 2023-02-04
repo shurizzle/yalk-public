@@ -19,11 +19,10 @@ type httpServer struct {
 	db     *sql.DB
 }
 
-func startHTTPServer(netConf configNetwork, dbConf postgreConfig) (*httpServer, error) {
-
+func startHTTPServer(netConf configNetwork, dbConn *sql.DB) (*httpServer, error) {
 	httpServer := &httpServer{
 		config: netConf,
-		db:     connector(dbConf),
+		db:     dbConn,
 	}
 
 	fs := http.FileServer(http.Dir("./static"))
@@ -44,8 +43,8 @@ func startHTTPServer(netConf configNetwork, dbConf postgreConfig) (*httpServer, 
 		logger.LogColor("WEBSRV", "HTTP listener started")
 		err := http.ListenAndServe(httpAddr, http.HandlerFunc(redirectToTLS))
 		if err != nil {
-			// panic(fmt.Sprintf("Error listening HTTP: %v", err))
-			panic(err)
+			panic(fmt.Sprintf("Error listening HTTP: %v", err))
+			// panic(err)
 		}
 	}()
 
@@ -53,8 +52,8 @@ func startHTTPServer(netConf configNetwork, dbConf postgreConfig) (*httpServer, 
 		logger.LogColor("WEBSRV", "HTTPS listener started")
 		err := http.ListenAndServeTLS(httpsAddr, "./certs/localhost.crt", "./certs/localhost.key", nil)
 		if err != nil {
-			// panic(fmt.Sprintf("Error listening HTTPS: %v", err))
-			panic(err)
+			panic(fmt.Sprintf("Error listening HTTPS: %v", err))
+			// panic(err)
 		}
 	}()
 
@@ -289,5 +288,6 @@ func favicon(w http.ResponseWriter, r *http.Request) {
 }
 func redirectToTLS(w http.ResponseWriter, r *http.Request) {
 	logger.LogColor("HTTPS", "Redirecting HTTP requests to HTTPS")
-	http.Redirect(w, r, ":443", http.StatusSeeOther)
+	url := activeServer.httpServer.config.URL
+	http.Redirect(w, r, fmt.Sprintf("%v:4443", url), http.StatusSeeOther)
 }

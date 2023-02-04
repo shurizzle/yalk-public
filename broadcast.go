@@ -45,12 +45,10 @@ func (server *server) handlePayload(msg []byte, origin string) (err error) {
 	}
 
 	/*
-		* Event 'data_image' contains a base64 encoded image
-		* Max 2MB, Accepts: jpg, jpeg, png, gif
-		* Picture is decoded and saved in users directory`
-		? MIME Type in payload
-		TODO: Add
-	*/
+	* Event 'data_image' contains a base64 encoded image
+	* Max 2MB, Accepts: jpg, jpeg, png, gif
+	* Picture is decoded and saved in users directory`
+	 */
 
 	// * Routing event to server
 	switch event {
@@ -321,7 +319,6 @@ func (server *server) router() {
 			fmt.Println("Router: Dm received")
 			dest := _p["users"].([]string)
 			payload := _p["payload"].(dataPayload)
-			// TODO: Move Chat logger to send to logger goroutine, broker will manage the instancing of all the goroutines only
 			_payload, err := json.Marshal(payload)
 			if err != nil {
 				log.Printf("Marshaling err")
