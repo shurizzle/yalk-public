@@ -140,7 +140,7 @@ func chatDelete(db *sql.DB, id string) (err error) {
 }
 
 func chatInfo(db *sql.DB, _id string, wantMsg bool) (chatroom chat, err error) {
-	sqlStatement := `SELECT * FROM server_chats WHERE id = $1`
+	sqlStatement := `SELECT * FROM public.server_chats WHERE id = $1`
 	var id string
 	var chatType string
 	var users []string
@@ -316,28 +316,38 @@ func serverSettingsRead(db *sql.DB) configServer {
 	}
 }
 
-func userCreate(db *sql.DB, username string, pwdHash string) (id string) {
-	sqlStatement := `INSERT INTO login_users (username, password)
-	VALUES ($1, $2)
+func userCreate(db *sql.DB, id string, username string, pwdHash string) (returnedId string) {
+	loginStatement := `INSERT INTO public.login_users (id, username, password)
+	VALUES ($1, $2, $3)
 	RETURNING id`
-	err := db.QueryRow(sqlStatement, username, pwdHash).Scan(&id)
+	// err := db.QueryRow(sqlStatement, username, pwdHash).Scan(&id)
+	err := db.QueryRow(loginStatement, id, username, pwdHash).Scan(&returnedId)
 	if err != nil {
 		logger.LogColor("DATABASE", "Error creating new user")
 		return
 	}
-	logger.LogColor("DATABASE", fmt.Sprintf("Added user %s with id %v", username, id))
+	settingsStatement := `INSERT INTO public.users_settings (id, display_name, color, is_admin)
+	VALUES ($1, $2, $3, $4)`
+	_, err = db.Exec(settingsStatement, id, "Admin", "#2596be", true)
+	if err != nil {
+		logger.LogColor("DATABASE", "Error CREATING user settings")
+		return
+	}
+	statusStatement := `INSERT INTO public.user_status(
+		id, status_fixed, status, last_login, last_offline, is_online)
+		VALUES ($1, $2, $3, $4, $5, $6);`
+	_, err = db.Exec(statusStatement, id, "Palle", "online", time.Now().UTC(), time.Now().UTC(), false)
+	if err != nil {
+		logger.LogColor("DATABASE", "Error CREATING user status")
+		return
+	}
+	logger.LogColor("DATABASE", fmt.Sprintf("Create profile with id %v", id))
+	logger.LogColor("DATABASE", fmt.Sprintf("Added user %s with id %v", username, returnedId))
 	return id
 }
 
 func profileCreate(db *sql.DB, id string, displayName string, color string, isAdmin string) {
-	sqlStatement := `INSERT INTO users_settings (id, display_name, color, isAdmin)
-	VALUES ($1, $2, $3, $4)`
-	_, err := db.Exec(sqlStatement, id, displayName, color, isAdmin)
-	if err != nil {
-		logger.LogColor("DATABASE", "Error CREATING new profile")
-		return
-	}
-	logger.LogColor("DATABASE", fmt.Sprintf("Create profile with id %v", id))
+
 }
 
 func userRead(db *sql.DB, id string, self bool) (userProfile profile, err error) {

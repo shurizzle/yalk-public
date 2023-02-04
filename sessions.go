@@ -136,7 +136,7 @@ func sessionCreate(token string, id string) (session *httpSession) {
 
 func sessionStore(db *sql.DB, id string, expires time.Time, token string, created time.Time) (err error) {
 	sqlStatement := `
-	INSERT INTO http_sessions (user_id, expires, session_token, created)
+	INSERT INTO public.http_sessions (user_id, expires, session_token, created)
 	VALUES ($1, $2, $3, $4)
 	ON CONFLICT (user_id) DO UPDATE
 		SET user_id = excluded.user_id,
@@ -149,7 +149,7 @@ func sessionStore(db *sql.DB, id string, expires time.Time, token string, create
 }
 
 func sessionRead(db *sql.DB, token string) (session httpSession, err error) {
-	sqlStatement := `SELECT * FROM http_sessions WHERE session_token=$1;`
+	sqlStatement := `SELECT * FROM public.http_sessions WHERE session_token=$1;`
 	var id string
 	var expires time.Time
 	var matchToken string
@@ -179,7 +179,7 @@ func sessionRead(db *sql.DB, token string) (session httpSession, err error) {
 
 func sessionDelete(db *sql.DB, token string) {
 	sqlStatement := `
-	DELETE FROM http_sessions
+	DELETE FROM public.http_sessions
 	WHERE session_token = $1;`
 	res, err := db.Exec(sqlStatement, token)
 	if err != nil {

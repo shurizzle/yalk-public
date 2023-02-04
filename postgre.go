@@ -10,8 +10,10 @@ import (
 	"chat/logger"
 	"database/sql"
 	"fmt"
+	"os"
 
 	_ "github.com/lib/pq"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type postgreConfig struct {
@@ -23,23 +25,23 @@ type postgreConfig struct {
 	SSLMode  string
 }
 
-func connector(config postgreConfig) (db *sql.DB) {
+func connector(config postgreConfig) (*sql.DB, error) {
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", config.IP, config.Port, config.Username, config.Password, config.DB, config.SSLMode)
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	err = db.Ping()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	return db
+	return db, err
 }
 
 func dbLogin(db *sql.DB, username string) (creds credentials) {
 	// var id uint8
-	sqlStatement := `SELECT id, username, password FROM login_users WHERE username=$1;`
+	sqlStatement := `SELECT id, username, password FROM public.login_users WHERE username=$1;`
 	var id string
 	var hash string
 
@@ -60,4 +62,89 @@ func dbLogin(db *sql.DB, username string) (creds credentials) {
 	default:
 		return
 	}
+}
+
+func initDb(config postgreConfig) (*sql.DB, error) {
+	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s sslmode=%s", config.IP, config.Port, config.Username, config.Password, config.SSLMode)
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		return nil, err
+	}
+	// TODO: Put "ping" everywhere before executing SQL statements
+	err = db.Ping()
+	if err != nil {
+		return nil, err
+	}
+	_, err = db.Exec("CREATE DATABASE db_chat")
+	if err != nil {
+		logger.LogColor("DATABASE", "Error UPDATING profile")
+		return nil, err
+	}
+	db.Close()
+
+	psqlInfo = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", config.IP, config.Port, config.Username, config.Password, config.DB, config.SSLMode)
+	db, err = sql.Open("postgres", psqlInfo)
+	if err != nil {
+		return nil, err
+	}
+	sqlFile, err := os.ReadFile("db_chat.sql")
+	if err != nil {
+		logger.LogColor("DATABASE", "Cannot read 'db_chat.sql'")
+		return nil, err
+	}
+	_, err = db.Exec(string(sqlFile))
+	if err != nil {
+		logger.LogColor("DATABASE", "Error executing 'db_chat.sql'")
+		return nil, err
+	}
+	logger.LogColor("DATABASE", "Executed 'db_chat.sql' succesfully.")
+
+	settingsSql := `INSERT INTO public.server_settings (key, value)
+					VALUES ('default_channel', 'CHATMAIN'), 
+							('server_id', '1');`
+	_, err = db.Exec(settingsSql)
+	if err != nil {
+		logger.LogColor("DATABASE", "Error creating server settings")
+	}
+
+	chatmainSql := `INSERT INTO public.server_chats (
+		id, type, users, name, created_by, created_date)
+		VALUES ('CHATMAIN', 'channel_public', '{}' ,'General', '0', current_timestamp);`
+	_, err = db.Exec(chatmainSql)
+	if err != nil {
+		logger.LogColor("DATABASE", "Error creating CHATMAIN")
+	}
+	chatrandSql := `INSERT INTO public.server_chats (
+			id, type, users, name, created_by, created_date)
+			VALUES ('CHATRAND', 'channel_public', '{}' ,'Random', '0', current_timestamp);`
+	_, err = db.Exec(chatrandSql)
+	if err != nil {
+		logger.LogColor("DATABASE", "Error creating CHATRAND")
+	}
+
+	defaultPwd, err := bcrypt.GenerateFromPassword([]byte("admin"), 14)
+	if err != nil {
+		logger.LogColor("DATABASE", "Can't hash admin default password")
+		return nil, err
+	}
+	id := userCreate(db, "1", "admin", string(defaultPwd))
+	logger.LogColor("DATABASE", fmt.Sprintf("Created 'admin' with id %v", id))
+	// chatCreate(db, "0", "channel_public", "General")
+
+	_, err = chatJoin(db, "1", "CHATMAIN")
+	if err != nil {
+		logger.LogColor("DATABASE", "Can't join user in CHATMAIN")
+		return nil, err
+	}
+	_, err = chatJoin(db, "1", "CHATRAND")
+	if err != nil {
+		logger.LogColor("DATABASE", "Can't join user in CHATRAND")
+		return nil, err
+	}
+	logger.LogColor("DATABASE", fmt.Sprintf("Updated id %v", id))
+
+	// logger.LogColor("DATABASE", fmt.Sprintf("Updated id %v", id))
+	logger.LogColor("DATABASE", "Succesfully created DB")
+	return db, nil
+
 }

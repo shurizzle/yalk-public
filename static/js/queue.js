@@ -5,7 +5,6 @@ import * as chat from "./chat.js"
 let sidebar = document.getElementById('sidebar')
 let usersContainer = document.getElementById('server-users')
 
-//TODO: Use payload as param for all functions inputs 
 export function handleEventsQueue(payload) {
     // if (ylk.Queued.length == 0) {
     //     return

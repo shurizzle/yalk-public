@@ -126,16 +126,23 @@ func main() {
 			websocket bool
 			tcp       bool
 		}{true, true, true},
-		dbconn: connector(dbConf),
 	}
-
-	var err error
+	dbConn, err := connector(dbConf)
+	if err != nil {
+		logger.LogColor("DATABASE", "DB not found, creating..")
+		dbConn, err = initDb(dbConf)
+		if err != nil {
+			logger.LogColor("DATABASE", "DB not found, creating..")
+		}
+	}
+	activeServer.dbconn = dbConn
 	logger.LogColor("WEBSRV", "Starting HTTP and HTTPS listeners..")
-	activeServer.httpServer, err = startHTTPServer(netConf, dbConf)
+	activeServer.httpServer, err = startHTTPServer(netConf, dbConn)
 	if err != nil {
 		panic(fmt.Sprintf("Instance cannot start HTTP Server: %v", err))
 	}
-	activeServer.websocket = newWebsocketServer(connector(dbConf), activeServer.channels)
+
+	activeServer.websocket = newWebsocketServer(dbConn, activeServer.channels)
 	// server.tcp = NewSocketServer(server.channels, tcp_dbconn, ip, socketPort, socketTransport)
 
 	http.HandleFunc("/websocket/connect", activeServer.connect)
@@ -186,7 +193,8 @@ func (server *server) connect(w http.ResponseWriter, r *http.Request) {
 
 	var wg sync.WaitGroup
 
-	ticker := time.NewTicker(time.Second * time.Duration(5000000))
+	// TODO: Properly introduce ping detection
+	ticker := time.NewTicker(time.Second * time.Duration(100000))
 
 	// **	Sender - From CLI to SRV	**	//
 	wg.Add(1)
