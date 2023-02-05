@@ -52,23 +52,25 @@ The setup should be pretty straightforward, feel free to open a PR should there 
 2. Open a Terminal/PowerShell
 3. Pull Postgres image
   `docker pull postgres`
-1. Run the PostgresSQL Server container
-  `docker run -p 5432:5432 -e POSTGRES_PASSWORD=yourpostgrespass postgres` 
-1. Get the container ID
+4. Run the PostgresSQL Server container
+  `docker run -p 5432:5432 -e POSTGRES_PASSWORD=yourpostgrespass postgres`
+  _You might need to open a new terminal now_
+5. Get the container ID
    `docker ps`
-2. Verify the Docker network IP Address for the container
+6. Verify the Docker network IP Address for the container
   `docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' container_id`
-1. Clone this repo in a user owned directory and enter the folder once finished
+  _This will need to be used as the Database address in your **Dockerfile**_
+7. Clone this repo in a user owned directory and enter the folder once finished
   `git clone https://github.com/Revengeic3/yalk-public.git`
-1. Edit the `Dockerfile` in the package root folder setting the correct configuration
-2. Generate certs and put them in **cert** folder
-3.  Build the container image
+8. Edit the `Dockerfile` in the package root folder setting the correct configuration
+9. Generate certs and put them in **cert** folder
+10. Build the container image
   `docker build -f Dockerfile -t revengeic3/yalk:latest .`
-1.   Run the container
+11. Run the container
   `docker run -p 8080:80 -p 4443:443 revengeic3/yalk:latest`
-1.   Open your browser to your set address using HTTPS
-2.   Login with Username 'admin' and Password 'admin'
-3.   Works! 🚀
+12. Open your browser to your set address using HTTPS
+13. Login with Username 'admin' and Password 'admin'
+14. Works! 🚀
 
 
 ### Know Bugs and To-Do's

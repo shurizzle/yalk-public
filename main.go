@@ -28,7 +28,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/joho/godotenv"
 	"nhooyr.io/websocket"
 )
 
@@ -80,10 +79,10 @@ type syncChannels struct {
 }
 
 func init() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		panic(err)
-	}
+	// err := godotenv.Load(".env")
+	// if err != nil {
+	// 	panic(err)
+	// }
 	log.Print("\033[H\033[2J")
 	var version string = "pre-alpha" // make it os.env
 	logger.LogColor("CORE", "Booting..")
