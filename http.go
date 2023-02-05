@@ -50,7 +50,7 @@ func startHTTPServer(netConf configNetwork, dbConn *sql.DB) (*httpServer, error)
 
 	go func() {
 		logger.LogColor("WEBSRV", "HTTPS listener started")
-		err := http.ListenAndServeTLS(httpsAddr, "./certs/localhost.crt", "./certs/localhost.key", nil)
+		err := http.ListenAndServeTLS(httpsAddr, "./certs/server.crt", "./certs/server.key", nil)
 		if err != nil {
 			panic(fmt.Sprintf("Error listening HTTPS: %v", err))
 			// panic(err)

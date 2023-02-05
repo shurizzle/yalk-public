@@ -78,7 +78,10 @@ Temporary Items
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,visualstudiocode,go
 
-certs/*
 Dockerfile.test
 .env
 .vscode/launch.json
+certs/localhost.crt
+.gitignore
+certs/localhost.csr
+.gitignore
