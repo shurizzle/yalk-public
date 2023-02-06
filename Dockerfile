@@ -1,9 +1,14 @@
-FROM golang:latest
+FROM golang:alpine AS build
 
-WORKDIR /app
+WORKDIR /build
+
 COPY . .
 
-EXPOSE 80 443
+RUN go build -ldflags '-s -w'
+
+FROM alpine:latest
+
+COPY --from=build /build/chat /yalk
 
 # It is adised to use '0.0.0.0' to allow all incoming connections
 ENV HOST_ADDR="0.0.0.0"
@@ -21,5 +26,6 @@ ENV DB_USER="postgres"
 ENV DB_PASSWORD="changeme"
 ENV DB_SSLMODE="disable"
 
+EXPOSE 80 443
 
- CMD ["go", "run", "."]
+CMD ["/yalk"]
