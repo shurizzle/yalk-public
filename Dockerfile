@@ -8,7 +8,10 @@ RUN go build -ldflags '-s -w'
 
 FROM alpine:latest
 
-COPY --from=build /build/chat /yalk
+COPY --from=build /build/chat /app/yalk
+COPY --from=build /build/static /app/static
+
+WORKDIR /app
 
 # It is adised to use '0.0.0.0' to allow all incoming connections
 ENV HOST_ADDR="0.0.0.0"
@@ -28,4 +31,4 @@ ENV DB_SSLMODE="disable"
 
 EXPOSE 80 443
 
-CMD ["/yalk"]
+CMD ["/app/yalk"]
