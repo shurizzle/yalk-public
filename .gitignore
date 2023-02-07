@@ -85,3 +85,6 @@ certs/localhost.crt
 .gitignore
 certs/localhost.csr
 .gitignore
+
+/certs/server.crt
+/certs/server.key
